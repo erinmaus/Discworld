@@ -32,27 +32,27 @@ std::string mapp::get_travel_type_literal(TravelType type)
 
 mapp::TravelType mapp::get_travel_type_from_literal(const std::string& literal)
 {
-	if (literal == "walk")
+	if (literal == "travel.walk")
 	{
 		return TravelType::walk;
 	}
-	if (literal == "teleport")
+	if (literal == "travel.teleport")
 	{
 		return TravelType::teleport;
 	}
-	if (literal == "shortcut")
+	if (literal == "travel.shortcut")
 	{
 		return TravelType::shortcut;
 	}
-	if (literal == "ship")
+	if (literal == "travel.ship")
 	{
 		return TravelType::ship;
 	}
-	if (literal == "object")
+	if (literal == "travel.object")
 	{
 		return TravelType::object;
 	}
-	if (literal == "npc")
+	if (literal == "travel.npc")
 	{
 		return TravelType::npc;
 	}

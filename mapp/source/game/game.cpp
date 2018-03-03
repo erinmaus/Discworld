@@ -437,8 +437,7 @@ mapp::Shop mapp::Game::add(const ShopDefinition& shop)
 	if (shop.location.resource.get_id())
 	{
 		twoflower::Action parent_link;
-		parent_link.builder().set_type("travel");
-		parent_link.builder().set_name("parent");
+		parent_link.builder().set_type(get_action_definition("travel", "parent"));
 		parent_link = brochure->builder().connect(parent_link, result.resource);
 		brochure->builder().connect(
 			twoflower::Requirement(),
@@ -446,8 +445,7 @@ mapp::Shop mapp::Game::add(const ShopDefinition& shop)
 			shop.location.resource);
 
 		twoflower::Action child_link;
-		child_link.builder().set_type("travel");
-		child_link.builder().set_name("child");
+		child_link.builder().set_type(get_action_definition("travel", "child"));
 		child_link = brochure->builder().connect(child_link, shop.location.resource);
 		brochure->builder().connect(
 			twoflower::Requirement(),
@@ -482,7 +480,7 @@ mapp::Shop mapp::Game::update(const Shop& shop, const ShopDefinition& definition
 	while (atlas.parent(shop.resource, parent))
 	{
 		auto actions = brochure->actions(parent.resource);
-		auto child = actions.by_type("travel", "child");
+		auto child = actions.by_name("travel", "child");
 		auto end = actions.end();
 		while (child != end)
 		{
@@ -498,7 +496,7 @@ mapp::Shop mapp::Game::update(const Shop& shop, const ShopDefinition& definition
 	}
 
 	auto actions = brochure->actions(shop.resource);
-	for (auto i = actions.by_type("travel", "parent"); i != actions.end(); ++i)
+	for (auto i = actions.by_name("travel", "parent"); i != actions.end(); ++i)
 	{
 		brochure->builder().remove_action(*i);
 	}
@@ -506,8 +504,7 @@ mapp::Shop mapp::Game::update(const Shop& shop, const ShopDefinition& definition
 	if (definition.location.resource.get_id())
 	{
 		twoflower::Action parent_link;
-		parent_link.builder().set_type("travel");
-		parent_link.builder().set_name("parent");
+		parent_link.builder().set_type(get_action_definition("travel", "parent"));
 		parent_link = brochure->builder().connect(parent_link, resource);
 		brochure->builder().connect(
 			twoflower::Requirement(),
@@ -515,8 +512,7 @@ mapp::Shop mapp::Game::update(const Shop& shop, const ShopDefinition& definition
 			definition.location.resource);
 
 		twoflower::Action child_link;
-		child_link.builder().set_type("travel");
-		child_link.builder().set_name("child");
+		child_link.builder().set_type(get_action_definition("travel", "child"));
 		child_link = brochure->builder().connect(child_link, definition.location.resource);
 		brochure->builder().connect(
 			twoflower::Requirement(),
@@ -554,7 +550,7 @@ mapp::Shops mapp::Game::shops(const Item& item) const
 
 	Shops results;
 	auto actions = brochure->actions(item.resource);
-	auto current = actions.by_type("buy", "shop");
+	auto current = actions.by_name("buy", "shop");
 	auto end = actions.end();
 	while (current != end)
 	{
@@ -588,7 +584,7 @@ mapp::Items mapp::Game::inventory(const Shop& shop) const
 
 	Items results;
 	auto actions = brochure->actions(shop.resource);
-	auto current = actions.by_type("buy", "shop");
+	auto current = actions.by_name("buy", "shop");
 	auto end = actions.end();
 	while (current != end)
 	{
@@ -619,7 +615,7 @@ void mapp::Game::add(const Shop& shop, const Item& item, int quantity)
 	if (get_buy_actions(shop, item, shop_buy_action, item_buy_action, inventory_resource))
 	{
 		auto actions = brochure->actions(inventory_resource);
-		for (auto i = actions.by_type("buy", "shop"); i != actions.end(); ++i)
+		for (auto i = actions.by_name("buy", "shop"); i != actions.end(); ++i)
 		{
 			auto requirements = brochure->requirements(*i);
 			for (auto requirement: requirements)
@@ -641,8 +637,7 @@ void mapp::Game::add(const Shop& shop, const Item& item, int quantity)
 		inventory_resource = brochure->builder().add_resource(inventory_resource);
 
 		twoflower::Action buy_action;
-		buy_action.builder().set_type("buy");
-		buy_action.builder().set_name("shop");
+		buy_action.builder().set_type(get_action_definition("buy", "shop"));
 
 		twoflower::Requirement quantity_requirement;
 		quantity_requirement.builder().set_count(quantity);
@@ -711,7 +706,7 @@ mapp::ShopPrice mapp::Game::price(const Shop& shop, const Item& item)
 
 	ShopPrice results;
 	auto actions = brochure->actions(shop.resource);
-	auto current = actions.by_type("buy", "shop");
+	auto current = actions.by_name("buy", "shop");
 	auto end = actions.end();
 	while (current != end)
 	{
@@ -770,7 +765,7 @@ int mapp::Game::quantity(const Shop& shop, const Item& item)
 	if (get_buy_actions(shop, item, shop_buy_action, item_buy_action, inventory_resource))
 	{
 		auto actions = brochure->actions(inventory_resource);
-		for (auto i = actions.by_type("buy", "shop"); i != actions.end(); ++i)
+		for (auto i = actions.by_name("buy", "shop"); i != actions.end(); ++i)
 		{
 			auto requirements = brochure->requirements(*i);
 			for (auto requirement: requirements)
@@ -810,7 +805,7 @@ static void remove_currency(
 	const mapp::Currency& currency)
 {
 	auto actions = brochure.actions(a);
-	auto current = actions.by_type("buy", "shop");
+	auto current = actions.by_name("buy", "shop");
 	auto end = actions.end();
 
 	while (current != end)
@@ -857,15 +852,45 @@ void mapp::Game::ensure_action_definition(
 	const std::string& name,
 	bool getter)
 {
-	if (!brochure->has_action_definition(type, name))
+	auto composed_name = type + "." + name;
+	auto actions = brochure->actions();
+	auto definitions_begin = actions.definitions(composed_name);
+	auto definitions_end = actions.end();
+
+	if (definitions_begin == definitions_end)
 	{
+		twoflower::Action::Type action_type;
+		action_type.name = composed_name;
+
 		twoflower::Action action;
-		action.builder().set_type(type);
-		action.builder().set_name(name);
+		action.builder().set_type(action_type);
 		action.builder().set_is_getter(getter);
 
 		brochure->builder().add_action_definition(action);
 	}
+}
+
+twoflower::Action::Type
+mapp::Game::get_action_definition(const std::string& type, const std::string& name) const
+{
+	auto composed_name = type + "." + name;
+	auto actions = brochure->actions();
+	auto definitions_begin = actions.definitions(composed_name);
+	auto definitions_end = actions.end();
+
+	if (definitions_begin == definitions_end)
+	{
+		throw std::runtime_error("action definition not in Brochure");
+	}
+
+	auto result = *definitions_begin;
+	++definitions_begin;
+	if (definitions_begin != definitions_end)
+	{
+		throw std::runtime_error("action definition ambiguous");
+	}
+
+	return result.get_type();
 }
 
 void mapp::Game::ensure_resource_type(const std::string& type)
@@ -904,7 +929,7 @@ bool mapp::Game::get_buy_actions(
 	twoflower::Action pending_shop_buy_action;
 
 	auto shop_actions = brochure->actions(shop.resource);
-	for (auto i = shop_actions.by_type("buy", "shop"); i != shop_actions.end(); ++i)
+	for (auto i = shop_actions.by_name("buy", "shop"); i != shop_actions.end(); ++i)
 	{
 		auto requirements = brochure->requirements(*i);
 
@@ -946,7 +971,7 @@ bool mapp::Game::get_buy_actions(
 	}
 
 	auto item_actions = brochure->actions(item.resource);
-	for (auto i = item_actions.by_type("buy", "shop"); i != item_actions.end(); ++i)
+	for (auto i = item_actions.by_name("buy", "shop"); i != item_actions.end(); ++i)
 	{
 		auto requirements = brochure->requirements(*i);
 

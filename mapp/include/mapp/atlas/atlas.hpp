@@ -71,6 +71,8 @@ namespace mapp
 
 	private:
 		void ensure_action_definition(const std::string& type, bool getter);
+		twoflower::Action::Type get_action_definition(const std::string& type, const std::string& name) const;
+
 		void ensure_resource_type(const std::string& type);
 		twoflower::Resource::Type get_resource_type(const std::string& type) const;
 		void ensure_root_location();

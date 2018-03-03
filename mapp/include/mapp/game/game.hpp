@@ -78,6 +78,7 @@ namespace mapp
 			const std::string& type,
 			const std::string& name,
 			bool getter);
+		twoflower::Action::Type get_action_definition(const std::string& type, const std::string& name) const;
 		void ensure_resource_type(const std::string& type);
 		twoflower::Resource::Type get_resource_type(const std::string& name) const;
 

@@ -293,14 +293,12 @@ mapp::Location mapp::Atlas::add(const LocationDefinition& definition, const Loca
 	}
 
 	twoflower::Action child_link;
-	child_link.builder().set_type("travel");
-	child_link.builder().set_name("child");
+	child_link.builder().set_type(get_action_definition("travel", "child"));
 	child_link = brochure->builder().connect(child_link, parent.resource);
 	brochure->builder().connect(twoflower::Requirement(), child_link, result.resource);
 
 	twoflower::Action parent_link;
-	parent_link.builder().set_type("travel");
-	parent_link.builder().set_name("parent");
+	parent_link.builder().set_type(get_action_definition("travel", "parent"));
 	parent_link = brochure->builder().connect(parent_link, result.resource);
 	brochure->builder().connect(twoflower::Requirement(), parent_link, parent.resource);
 
@@ -384,14 +382,12 @@ mapp::Amenity mapp::Atlas::add(const AmenityDefinition& amenity, const Location&
 	result.resource = brochure->builder().add_resource(result.resource);
 
 	twoflower::Action child_link;
-	child_link.builder().set_type("travel");
-	child_link.builder().set_name("amenity");
+	child_link.builder().set_type(get_action_definition("travel", "amenity"));
 	child_link = brochure->builder().connect(child_link, parent.resource);
 	brochure->builder().connect(twoflower::Requirement(), child_link, result.resource);
 
 	twoflower::Action parent_link;
-	parent_link.builder().set_type("travel");
-	parent_link.builder().set_name("parent");
+	parent_link.builder().set_type(get_action_definition("travel", "parent"));
 	parent_link = brochure->builder().connect(parent_link, result.resource);
 	brochure->builder().connect(twoflower::Requirement(), parent_link, parent.resource);
 
@@ -441,7 +437,7 @@ bool mapp::Atlas::parent(
 	Location& result) const
 {
 	auto actions = brochure->actions(resource);
-	auto iter = actions.by_type("travel", "parent");
+	auto iter = actions.by_name("travel", "parent");
 	auto end = actions.end();
 
 	auto location_resource_id = get_resource_type("location").id;
@@ -476,7 +472,7 @@ mapp::Locations mapp::Atlas::children(const Location& location) const
 	}
 
 	auto actions = brochure->actions(location.resource);
-	auto iter = actions.by_type("travel", "child");
+	auto iter = actions.by_name("travel", "child");
 	auto end = actions.end();
 
 	auto location_resource_id = get_resource_type("location").id;
@@ -576,7 +572,7 @@ bool mapp::Atlas::amenity(const twoflower::Resource& resource, Amenity& result) 
 mapp::Amenities mapp::Atlas::amenities(const Location& location) const
 {
 	auto actions = brochure->actions(location.resource);
-	auto current = actions.by_type("travel", "amenity");
+	auto current = actions.by_name("travel", "amenity");
 	auto end = actions.end();
 
 	auto amenity_resource_id = get_resource_type("amenity").id;
@@ -609,8 +605,7 @@ mapp::Amenities mapp::Atlas::amenities(const Location& location) const
 mapp::Link mapp::Atlas::connect(TravelType type, const Location& destination)
 {
 	twoflower::Action action;
-	action.builder().set_type("travel");
-	action.builder().set_name(get_travel_type_literal(type));
+	action.builder().set_type(get_action_definition("travel", get_travel_type_literal(type)));
 	action = brochure->builder().connect(action, destination.resource);
 
 	Link result;
@@ -627,8 +622,7 @@ mapp::Link mapp::Atlas::connect(
 	float cost)
 {
 	twoflower::Action action;
-	action.builder().set_type("travel");
-	action.builder().set_name(get_travel_type_literal(type));
+	action.builder().set_type(get_action_definition("travel", get_travel_type_literal(type)));
 	if (cost != HUGE_VALF)
 	{
 		action.builder().set_cost_multiplier(cost);
@@ -681,7 +675,7 @@ void mapp::Atlas::remove(const Link& link)
 mapp::Link mapp::Atlas::link(const twoflower::Action& action) const
 {
 	Link result;
-	result.type = get_travel_type_from_literal(action.get_name());
+	result.type = get_travel_type_from_literal(action.get_type().name);
 	result.action = action;
 
 	auto destination_resource = brochure->resource(action);
@@ -718,7 +712,7 @@ bool mapp::Atlas::destination(const twoflower::Action& action, Location& result)
 mapp::Links mapp::Atlas::links(const Location& location) const
 {
 	auto actions = brochure->actions(location.resource);
-	auto current = actions.by_type("travel");
+	auto current = actions.by_name("travel", "%");
 	auto end = actions.end();
 
 	Links results;
@@ -742,15 +736,45 @@ const mapp::Location& mapp::Atlas::root() const
 
 void mapp::Atlas::ensure_action_definition(const std::string& type, bool getter)
 {
-	if (!brochure->has_action_definition("travel", type))
+	auto composed_name = std::string("travel.") + type;
+	auto actions = brochure->actions();
+	auto definitions_begin = actions.definitions(composed_name);
+	auto definitions_end = actions.end();
+
+	if (definitions_begin == definitions_end)
 	{
+		twoflower::Action::Type action_type;
+		action_type.name = composed_name;
+
 		twoflower::Action action;
-		action.builder().set_type("travel");
-		action.builder().set_name(type);
+		action.builder().set_type(action_type);
 		action.builder().set_is_getter(getter);
 
 		brochure->builder().add_action_definition(action);
 	}
+}
+
+twoflower::Action::Type
+mapp::Atlas::get_action_definition(const std::string& type, const std::string& name) const
+{
+	auto composed_name = type + "." + name;
+	auto actions = brochure->actions();
+	auto definitions_begin = actions.definitions(composed_name);
+	auto definitions_end = actions.end();
+
+	if (definitions_begin == definitions_end)
+	{
+		throw std::runtime_error("action definition not in Brochure");
+	}
+
+	auto result = *definitions_begin;
+	++definitions_begin;
+	if (definitions_begin != definitions_end)
+	{
+		throw std::runtime_error("action definition ambiguous");
+	}
+
+	return result.get_type();
 }
 
 void mapp::Atlas::ensure_resource_type(const std::string& type)

@@ -44,6 +44,12 @@ twoflower::Brochure::Actions::by_type(const Action::Type& type) const
 }
 
 twoflower::Brochure::Actions::const_iterator
+twoflower::Brochure::Actions::by_name(const std::string& type, const std::string& name) const
+{
+	return by_name(type + "." + name);
+}
+
+twoflower::Brochure::Actions::const_iterator
 twoflower::Brochure::Actions::by_name(const std::string& name) const
 {
 	std::string query = "SELECT * FROM ActionInstance"

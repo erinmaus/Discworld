@@ -213,6 +213,7 @@ namespace twoflower
 		struct const_iterator;
 		const_iterator by_type(const Action::Type& type) const;
 		const_iterator by_name(const std::string& name) const;
+		const_iterator by_name(const std::string& type, const std::string& name) const;
 		const_iterator getters() const;
 
 		const_iterator definitions() const;
