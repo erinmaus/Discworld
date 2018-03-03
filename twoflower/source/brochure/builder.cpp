@@ -341,16 +341,10 @@ void twoflower::Brochure::Builder::unset_userdata(
 
 void twoflower::Brochure::Builder::add_action_definition(const Action& action)
 {
-	if (brochure->has_action_definition(action.get_type(), action.get_name()))
-	{
-		throw std::runtime_error("action already in brochure; cannot add");
-	}
-
 	auto statement = brochure->database->create_statement(
 		"INSERT INTO ActionDefinition(type, name, getter, task, cost)"
 		" VALUES (?, ?, ?, ?, ?);");
-	statement.bind(1, action.get_type());
-	statement.bind(2, action.get_name());
+	statement.bind(1, action.get_type().name);
 	statement.bind(3, action.is_getter());
 	statement.bind(4, action.get_task());
 	statement.bind(5, action.get_cost_multiplier());
@@ -363,14 +357,12 @@ void twoflower::Brochure::Builder::update_action(const Action& action)
 	{
 		auto statement = brochure->database->create_statement(
 			"UPDATE ActionInstance SET\n"
-			" action_type=:action_type,\n"
-			" action_name=:action_name,\n"
+			" action_id=:action_id,\n"
 			" task=:task,\n"
 			" cost=:cost\n"
 			"WHERE id=:id;\n");
 		statement.bind(":id", action.get_id());
-		statement.bind(":action_type", action.get_type());
-		statement.bind(":action_name", action.get_name());
+		statement.bind(":action_id", action.get_type().id);
 		if (!action.get_task().empty())
 		{
 			statement.bind(":task", action.get_task());
@@ -384,7 +376,7 @@ void twoflower::Brochure::Builder::update_action(const Action& action)
 	}
 	else
 	{
-		if (!brochure->has_action_definition(action.get_type(), action.get_name()))
+		if (!brochure->has_action_definition(action.get_type().id))
 		{
 			throw std::runtime_error("action not in brochure; cannot update");
 		}
@@ -395,8 +387,6 @@ void twoflower::Brochure::Builder::update_action(const Action& action)
 			" task=:task,\n"
 			" cost=:cost\n"
 			"WHERE type = :type and name = :name;\n");
-		statement.bind(":type", action.get_type());
-		statement.bind(":name", action.get_name());
 		statement.bind(":getter", action.is_getter());
 		statement.bind(":task", action.get_task());
 		statement.bind(":cost", action.get_cost_multiplier());
@@ -422,9 +412,8 @@ void twoflower::Brochure::Builder::remove_action(const Action& action)
 	else
 	{
 		auto statement = brochure->database->create_statement(
-			"DELETE FROM ActionDefinition WHERE type=? AND name=?;");
-		statement.bind(1, action.get_type());
-		statement.bind(2, action.get_name());
+			"DELETE FROM ActionDefinition WHERE id=?;");
+		statement.bind(1, action.get_type().id);
 		statement.execute();
 	}
 }
@@ -432,7 +421,7 @@ void twoflower::Brochure::Builder::remove_action(const Action& action)
 twoflower::Action twoflower::Brochure::Builder::connect(
 	const Action& action, const Resource& resource)
 {
-	if (!brochure->has_action_definition(action.get_type(), action.get_name()))
+	if (!brochure->has_action_definition(action.get_type().id))
 	{
 		throw std::runtime_error("action definition not in brochure; cannot connect to resource");
 	}
@@ -443,10 +432,9 @@ twoflower::Action twoflower::Brochure::Builder::connect(
 	}
 
 	auto statement = brochure->database->create_statement(
-		"INSERT INTO ActionInstance(action_type, action_name, resource_id) VALUES(?, ?, ?);");
-	statement.bind(1, action.get_type());
-	statement.bind(2, action.get_name());
-	statement.bind(3, resource.get_id());
+		"INSERT INTO ActionInstance(action_id, resource_id) VALUES(?, ?, ?);");
+	statement.bind(1, action.get_type().id);
+	statement.bind(2, resource.get_id());
 	statement.execute();
 
 	int id;

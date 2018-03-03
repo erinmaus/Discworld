@@ -74,14 +74,11 @@ std::vector<twoflower::Resource::Type> twoflower::Brochure::get_resource_types(c
 	return result;
 }
 
-bool twoflower::Brochure::has_action_definition(
-	const std::string& type,
-	const std::string& name) const
+bool twoflower::Brochure::has_action_definition(int id) const
 {
 	auto statement = database->create_statement(
-		"SELECT * FROM ActionDefinition WHERE type=? AND name=?;");
-	statement.bind(1, type);
-	statement.bind(2, name);
+		"SELECT * FROM ActionDefinition WHERE id=?;");
+	statement.bind(1, id);
 
 	return statement.execute() != 0;
 }
@@ -250,8 +247,8 @@ twoflower::Brochure::Requirements twoflower::Brochure::requirements(const Action
 void twoflower::Brochure::make_tables()
 {
 	Table action_definition("ActionDefinition");
-	action_definition.add_primary_key("type", Table::Type::text);
-	action_definition.add_primary_key("name", Table::Type::text);
+	action_definition.add_primary_key("id", Table::Type::integer);
+	action_definition.add_column("name", Table::Type::text, false);
 	action_definition.add_column("getter", Table::Type::integer, false);
 	action_definition.add_column("task", Table::Type::text, true);
 	action_definition.add_column("cost", Table::Type::real, true);
@@ -287,13 +284,11 @@ void twoflower::Brochure::make_tables()
 
 	Table action_instance("ActionInstance");
 	action_instance.add_primary_key("id", Table::Type::integer);
-	action_instance.add_column("action_type", Table::Type::text, false);
-	action_instance.add_column("action_name", Table::Type::text, false);
+	action_instance.add_column("action_id", Table::Type::text, false);
 	action_instance.add_column("resource_id", Table::Type::integer, false);
 	action_instance.add_column("task", Table::Type::text, true);
 	action_instance.add_column("cost", Table::Type::real, true);
-	action_instance.bind_foreign_key("ActionDefinition", "action_type", "type");
-	action_instance.bind_foreign_key("ActionDefinition", "action_name", "name");
+	action_instance.bind_foreign_key("ActionDefinition", "action_id", "id");
 	action_instance.bind_foreign_key("Resource", "resource_id", "id");
 	create_table(action_instance);
 

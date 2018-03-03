@@ -38,7 +38,7 @@ namespace twoflower
 		Resource::Type get_resource_type(int id) const;
 		std::vector<Resource::Type> get_resource_types(const std::string& name) const;
 
-		bool has_action_definition(const std::string& type, const std::string& name) const;
+		bool has_action_definition(int id) const;
 
 		bool get_userdata(
 			const Resource& resource,
@@ -211,12 +211,12 @@ namespace twoflower
 		Actions(const Brochure& brochure, const Resource& resource);
 
 		struct const_iterator;
-		const_iterator by_type(
-			const std::string& type,
-			const std::string& name = std::string()) const;
+		const_iterator by_type(const Action::Type& type) const;
+		const_iterator by_name(const std::string& name) const;
 		const_iterator getters() const;
 
 		const_iterator definitions() const;
+		const_iterator definitions(const std::string& name) const;
 
 		const_iterator begin() const;
 		const_iterator end() const;

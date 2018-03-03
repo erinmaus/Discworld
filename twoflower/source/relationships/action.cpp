@@ -18,16 +18,10 @@ int twoflower::Action::get_id() const
 	return id;
 }
 
-const std::string& twoflower::Action::get_type() const
+const twoflower::Action::Type& twoflower::Action::get_type() const
 {
 	return type;
 }
-
-const std::string& twoflower::Action::get_name() const
-{
-	return name;
-}
-
 bool twoflower::Action::is_getter() const
 {
 	return getter;
@@ -64,14 +58,9 @@ void twoflower::Action::Builder::set_id(int value)
 	action->id = value;
 }
 
-void twoflower::Action::Builder::set_type(const std::string& value)
+void twoflower::Action::Builder::set_type(const twoflower::Action::Type& value)
 {
 	action->type = value;
-}
-
-void twoflower::Action::Builder::set_name(const std::string& value)
-{
-	action->name = value;
 }
 
 void twoflower::Action::Builder::set_is_getter(bool value)

@@ -28,26 +28,35 @@ twoflower::Brochure::Actions::Actions(
 }
 
 twoflower::Brochure::Actions::const_iterator
-twoflower::Brochure::Actions::by_type(
-	const std::string& type,
-	const std::string& name) const
+twoflower::Brochure::Actions::by_type(const Action::Type& type) const
 {
-	std::string query = "SELECT * FROM ActionInstance WHERE action_type=:type";
-	if (!name.empty())
-	{
-		query += " AND action_name=:name";
-	}
+	std::string query = "SELECT * FROM ActionInstance WHERE action_id=:action_id";
 	if (is_limited)
 	{
-		query += " AND resource_id=:id";
+		query += " AND resource_id=:resource_id";
 	}
-
 	query += ";";
 
 	auto statement = brochure->database->create_statement(query);
-	statement.bind(":type", type);
+	statement.bind(":action_id", type.id);
+	statement.bind(":resource_id", resource.get_id());
+	return const_iterator(*brochure->database, statement);
+}
+
+twoflower::Brochure::Actions::const_iterator
+twoflower::Brochure::Actions::by_name(const std::string& name) const
+{
+	std::string query = "SELECT * FROM ActionInstance"
+		" INNER JOIN ActionDefinition"
+		" ON ActionDefinition.name=:name";
+	if (is_limited)
+	{
+		query += " WHERE resource_id=:resource_id";
+	}
+	query += ";";
+
+	auto statement = brochure->database->create_statement(query);
 	statement.bind(":name", name);
-	statement.bind(":id", resource.get_id());
 	return const_iterator(*brochure->database, statement);
 }
 
@@ -56,8 +65,7 @@ twoflower::Brochure::Actions::getters() const
 {
 	std::string query = "SELECT * FROM ActionInstance";
 	query += " INNER JOIN ActionDefinition"
-		" ON ActionDefinition.type=ActionInstance.action_type"
-		" AND ActionDefinition.name=ActionInstance.action_name"
+		" ON ActionDefinition.id=ActionInstance.action_id"
 		" AND ActionDefinition.getter=1";
 	if (is_limited)
 	{
@@ -74,7 +82,16 @@ twoflower::Brochure::Actions::const_iterator
 twoflower::Brochure::Actions::definitions() const
 {
 	auto statement = brochure->database->create_statement(
-		"SELECT * FROM ActionDefinition");
+		"SELECT * FROM ActionDefinition;");
+	return const_iterator(*brochure->database, statement, false);
+}
+
+twoflower::Brochure::Actions::const_iterator
+twoflower::Brochure::Actions::definitions(const std::string& name) const
+{
+	auto statement = brochure->database->create_statement(
+		"SELECT * FROM ActionDefinition WHERE name=?");
+	statement.bind(1, name);
 	return const_iterator(*brochure->database, statement, false);
 }
 
@@ -111,7 +128,7 @@ bool twoflower::Brochure::Actions::has(const Action& action) const
 	}
 	else
 	{
-		return brochure->has_action_definition(action.get_type(), action.get_name());
+		return brochure->has_action_definition(action.get_type().id);
 	}
 }
 
@@ -206,42 +223,45 @@ void twoflower::Brochure::Actions::const_iterator::next()
 	{
 		Action::Builder builder(value);
 
-		int id;
-		statement->get("id", id);
-		builder.set_id(id);
-
-		std::string type;
 		if (is_instance)
 		{
-			statement->get("action_type", type);
+			int id;
+			statement->get("id", id);
+			builder.set_id(id);
+		}
+
+		Action::Type type;
+		if (is_instance)
+		{
+			int action_definition_id;
+			statement->get("action_id", action_definition_id);
+
+			auto name_statement = database->create_statement(
+				"SELECT name FROM ActionDefinition WHERE id=?;");
+			name_statement.bind(1, action_definition_id);
+			name_statement.next();
+
+			type.id = action_definition_id;
+			name_statement.get("name", type.name);
 		}
 		else
 		{
-			statement->get("type", type);
+			statement->get("id", type.id);
+			statement->get("name", type.name);
 		}
-		builder.set_type(type);
-
-		std::string name;
-		if (is_instance)
-		{
-			statement->get("action_name", name);
-		}
-		else
-		{
-			statement->get("name", name);
-		}
-		builder.set_name(name);
 
 		int getter;
 		if (is_instance)
 		{
+			int action_definition_id;
+			statement->get("action_id", action_definition_id);
+
 			auto getter_statement = database->create_statement(
-				"SELECT getter FROM ActionDefinition WHERE type=? AND name=?");
-			getter_statement.bind(1, type);
-			getter_statement.bind(2, name);
+				"SELECT getter FROM ActionDefinition WHERE id=?;");
+			getter_statement.bind(1, action_definition_id);
 			getter_statement.next();
 
-			getter_statement.get(0, getter);
+			getter_statement.get("getter", getter);
 		}
 		else
 		{
@@ -250,15 +270,17 @@ void twoflower::Brochure::Actions::const_iterator::next()
 		builder.set_is_getter(getter);
 
 		std::string task;
-		if (statement->empty("task"))
+		if (statement->empty("task") && is_instance)
 		{
+			int action_definition_id;
+			statement->get("action_id", action_definition_id);
+
 			auto task_statement = database->create_statement(
-				"SELECT task FROM ActionDefinition WHERE type=? AND name=?");
-			task_statement.bind(1, type);
-			task_statement.bind(2, name);
+				"SELECT task FROM ActionDefinition WHERE id=?;");
+			task_statement.bind(1, action_definition_id);
 			task_statement.next();
 
-			task_statement.get(0, task);
+			task_statement.get("task", task);
 		}
 		else
 		{
@@ -267,13 +289,17 @@ void twoflower::Brochure::Actions::const_iterator::next()
 		builder.set_task(task);
 
 		float cost;
-		if (statement->empty("cost"))
+		if (statement->empty("cost") && is_instance)
 		{
+			int action_definition_id;
+			statement->get("action_id", action_definition_id);
+
 			auto cost_statement = database->create_statement(
-				"SELECT cost FROM ActionDefinition WHERE type=? AND name=?");
-			cost_statement.bind(1, type);
-			cost_statement.bind(2, name);
+				"SELECT task FROM ActionDefinition WHERE id=?;");
+			cost_statement.bind(1, action_definition_id);
 			cost_statement.next();
+
+			cost_statement.get("task", task);
 
 			cost_statement.get(0, cost);
 		}

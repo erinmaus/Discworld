@@ -23,9 +23,14 @@ namespace twoflower
 		class Builder;
 		Builder builder();
 
+		struct Type
+		{
+			int id;
+			std::string name;
+		};
+
 		int get_id() const;
-		const std::string& get_type() const;
-		const std::string& get_name() const;
+		const Type& get_type() const;
 		bool is_getter() const;
 		const std::string& get_task() const;
 		float get_cost_multiplier() const;
@@ -33,8 +38,7 @@ namespace twoflower
 
 	private:
 		int id = 0;
-		std::string type;
-		std::string name;
+		Type type;
 		bool getter = false;
 		std::string task;
 		float cost_multiplier = HUGE_VALF;
@@ -46,8 +50,7 @@ namespace twoflower
 		Builder(Action& action);
 
 		void set_id(int id);
-		void set_type(const std::string& value);
-		void set_name(const std::string& value);
+		void set_type(const Type& type);
 		void set_is_getter(bool value);
 		void set_task(const std::string& value);
 		void set_cost_multiplier(float value);
