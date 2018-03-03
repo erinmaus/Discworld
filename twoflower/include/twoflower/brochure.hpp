@@ -36,6 +36,7 @@ namespace twoflower
 
 		bool has_resource_type(int id) const;
 		Resource::Type get_resource_type(int id) const;
+		std::vector<Resource::Type> get_resource_types(const std::string& name) const;
 
 		bool has_action_definition(const std::string& type, const std::string& name) const;
 

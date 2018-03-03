@@ -57,6 +57,23 @@ twoflower::Resource::Type twoflower::Brochure::get_resource_type(int id) const
 	return type;
 }
 
+std::vector<twoflower::Resource::Type> twoflower::Brochure::get_resource_types(const std::string& name) const
+{
+	auto statement = database->create_statement(
+		"SELECT name FROM ResourceType WHERE name=?;");
+	statement.bind(1, name);
+
+	std::vector<twoflower::Resource::Type> result;
+	while (statement.next())
+	{
+		Resource::Type type;
+		statement.get("id", type.id);
+		statement.get("name", type.name);
+	}
+
+	return result;
+}
+
 bool twoflower::Brochure::has_action_definition(
 	const std::string& type,
 	const std::string& name) const
