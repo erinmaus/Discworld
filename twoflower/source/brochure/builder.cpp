@@ -26,12 +26,11 @@ twoflower::Resource::Type twoflower::Brochure::Builder::add_resource_type(const 
 	statement.bind(1, name);
 	statement.execute();
 
-
 	auto id_statement = brochure->database->create_statement("SELECT last_insert_rowid();");
-	statement.execute();
+	id_statement.execute();
 
 	Resource::Type result;
-	statement.get(0, result.id);
+	statement.get("id", result.id);
 	result.name = name;
 
 	return result;
@@ -342,12 +341,12 @@ void twoflower::Brochure::Builder::unset_userdata(
 void twoflower::Brochure::Builder::add_action_definition(const Action& action)
 {
 	auto statement = brochure->database->create_statement(
-		"INSERT INTO ActionDefinition(type, name, getter, task, cost)"
-		" VALUES (?, ?, ?, ?, ?);");
+		"INSERT INTO ActionDefinition(name, getter, task, cost)"
+		" VALUES (?, ?, ?, ?);");
 	statement.bind(1, action.get_type().name);
-	statement.bind(3, action.is_getter());
-	statement.bind(4, action.get_task());
-	statement.bind(5, action.get_cost_multiplier());
+	statement.bind(2, action.is_getter());
+	statement.bind(3, action.get_task());
+	statement.bind(4, action.get_cost_multiplier());
 	statement.execute();
 }
 

@@ -153,10 +153,10 @@ namespace twoflower
 		struct const_iterator;
 		const_iterator by_name(
 			const std::string& name,
-			const std::string& type = std::string()) const;
+			const Resource::Type& type = Resource::Type()) const;
 		const_iterator by_fuzzy_name(
 			const std::string& name,
-			const std::string& type = std::string()) const;
+			const Resource::Type& type = Resource::Type()) const;
 		const_iterator by_type(const Resource::Type& type) const;
 		const_iterator by_type(int type) const;
 

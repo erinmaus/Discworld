@@ -60,7 +60,7 @@ twoflower::Resource::Type twoflower::Brochure::get_resource_type(int id) const
 std::vector<twoflower::Resource::Type> twoflower::Brochure::get_resource_types(const std::string& name) const
 {
 	auto statement = database->create_statement(
-		"SELECT name FROM ResourceType WHERE name=?;");
+		"SELECT id, name FROM ResourceType WHERE name=?;");
 	statement.bind(1, name);
 
 	std::vector<twoflower::Resource::Type> result;
@@ -69,6 +69,8 @@ std::vector<twoflower::Resource::Type> twoflower::Brochure::get_resource_types(c
 		Resource::Type type;
 		statement.get("id", type.id);
 		statement.get("name", type.name);
+
+		result.push_back(type);
 	}
 
 	return result;

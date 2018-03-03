@@ -18,14 +18,14 @@ twoflower::Brochure::Resources::Resources(const Brochure& brochure) :
 }
 
 twoflower::Brochure::Resources::const_iterator
-twoflower::Brochure::Resources::by_name(const std::string& name, const std::string& type) const
+twoflower::Brochure::Resources::by_name(const std::string& name, const Resource::Type& type) const
 {
-	if (!type.empty())
+	if (type.id)
 	{
 		auto statement = brochure->database->create_statement(
 			"SELECT * FROM Resource WHERE name=? AND resource_type=?;");
 		statement.bind(1, name);
-		statement.bind(2, type);
+		statement.bind(2, type.id);
 
 		return const_iterator(*brochure, statement);
 	}
@@ -40,7 +40,7 @@ twoflower::Brochure::Resources::by_name(const std::string& name, const std::stri
 }
 
 twoflower::Brochure::Resources::const_iterator
-twoflower::Brochure::Resources::by_fuzzy_name(const std::string& name, const std::string& type) const
+twoflower::Brochure::Resources::by_fuzzy_name(const std::string& name, const Resource::Type& type) const
 {
 	std::string fuzzy_name;
 	fuzzy_name.resize(name.length() * 2 + 1, '%');
@@ -49,12 +49,12 @@ twoflower::Brochure::Resources::by_fuzzy_name(const std::string& name, const std
 		fuzzy_name[i * 2 + 1] = name[i];
 	}
 
-	if (!type.empty())
+	if (type.id)
 	{
 		auto statement = brochure->database->create_statement(
 			"SELECT * FROM Resource WHERE name LIKE ? COLLATE NOCASE AND resource_type=?;");
-		statement.bind(1, fuzzy_name);
-		statement.bind(2, type);
+		statement.bind(1, name);
+		statement.bind(2, type.id);
 
 		return const_iterator(*brochure, statement);
 	}

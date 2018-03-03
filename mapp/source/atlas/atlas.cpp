@@ -88,7 +88,7 @@ mapp::Locations mapp::Atlas::find(const std::string& address) const
 	auto components = split(address, ",");
 
 	std::vector<twoflower::Resource> candidates;
-	auto current = brochure->resources().by_name(components[0], "location");
+	auto current = brochure->resources().by_name(components[0], get_resource_type("location"));
 	auto end = brochure->resources().end();
 	while (current != end)
 	{
@@ -168,7 +168,7 @@ mapp::Locations mapp::Atlas::fuzzy_find(const std::string& address) const
 	auto components = split(address, ",");
 
 	std::vector<twoflower::Resource> candidates;
-	auto current = brochure->resources().by_fuzzy_name(components[0], "location");
+	auto current = brochure->resources().by_fuzzy_name(components[0], get_resource_type("location"));
 	auto end = brochure->resources().end();
 	while (current != end)
 	{
@@ -512,26 +512,6 @@ bool mapp::Atlas::location(const twoflower::Resource& resource, Location& result
 		return true;
 	}
 
-	if (!brochure->has_userdata(resource, "mapp-location-shape"))
-	{
-		return false;
-	}
-
-	std::vector<std::uint8_t> shape_data;
-	if (!brochure->get_userdata(resource, "mapp-location-shape", shape_data))
-	{
-		return false;
-	}
-
-	int min_x, min_y, max_x, max_y;
-	if (!brochure->get_userdata(resource, "mapp-location-min-x", min_x) ||
-		!brochure->get_userdata(resource, "mapp-location-min-y", min_y) ||
-		!brochure->get_userdata(resource, "mapp-location-max-x", max_x) ||
-		!brochure->get_userdata(resource, "mapp-location-max-y", max_y))
-	{
-		return false;
-	}
-
 	int anchor_x, anchor_y;
 	bool has_anchor = true;
 	if (brochure->get_userdata(resource, "mapp-location-anchor-x", anchor_x) &&
@@ -805,7 +785,7 @@ twoflower::Resource::Type mapp::Atlas::get_resource_type(const std::string& type
 void mapp::Atlas::ensure_root_location()
 {
 	twoflower::Resource root;
-	auto iter = brochure->resources().by_name("RS", "location");
+	auto iter = brochure->resources().by_name("RS", get_resource_type("location"));
 	if (iter == brochure->resources().end())
 	{
 		twoflower::Resource root_definition;
