@@ -27,7 +27,7 @@ twoflower::Brochure::Resources::by_name(const std::string& name, const std::stri
 		statement.bind(1, name);
 		statement.bind(2, type);
 
-		return const_iterator(statement);
+		return const_iterator(*brochure, statement);
 	}
 	else
 	{
@@ -35,7 +35,7 @@ twoflower::Brochure::Resources::by_name(const std::string& name, const std::stri
 			"SELECT * FROM Resource WHERE name=?;");
 		statement.bind(1, name);
 
-		return const_iterator(statement);
+		return const_iterator(*brochure, statement);
 	}
 }
 
@@ -56,7 +56,7 @@ twoflower::Brochure::Resources::by_fuzzy_name(const std::string& name, const std
 		statement.bind(1, fuzzy_name);
 		statement.bind(2, type);
 
-		return const_iterator(statement);
+		return const_iterator(*brochure, statement);
 	}
 	else
 	{
@@ -64,18 +64,27 @@ twoflower::Brochure::Resources::by_fuzzy_name(const std::string& name, const std
 			"SELECT * FROM Resource WHERE name LIKE ? COLLATE NOCASE;");
 			statement.bind(1, fuzzy_name);
 
-			return const_iterator(statement);
+			return const_iterator(*brochure, statement);
 	}
+}
+twoflower::Brochure::Resources::const_iterator
+twoflower::Brochure::Resources::by_type(const Resource::Type& type) const
+{
+	auto statement = brochure->database->create_statement(
+		"SELECT * FROM Resource WHERE resource_type=?;");
+	statement.bind(1, type.id);
+
+	return const_iterator(*brochure, statement);
 }
 
 twoflower::Brochure::Resources::const_iterator
-twoflower::Brochure::Resources::by_type(const std::string& type) const
+twoflower::Brochure::Resources::by_type(int type) const
 {
 	auto statement = brochure->database->create_statement(
 		"SELECT * FROM Resource WHERE resource_type=?;");
 	statement.bind(1, type);
 
-	return const_iterator(statement);
+	return const_iterator(*brochure, statement);
 }
 
 bool twoflower::Brochure::Resources::has(const Resource& resource) const
@@ -102,7 +111,7 @@ twoflower::Resource twoflower::Brochure::Resources::get(int id) const
 	auto statement = brochure->database->create_statement(
 		"SELECT * FROM Resource WHERE id=?;");
 	statement.bind(1, id);
-	auto iter = const_iterator(statement);
+	auto iter = const_iterator(*brochure, statement);
 	return *iter;
 }
 
@@ -111,7 +120,7 @@ twoflower::Brochure::Resources::begin() const
 {
 	auto statement = brochure->database->create_statement(
 		"SELECT * FROM Resource;");
-	return const_iterator(statement);
+	return const_iterator(*brochure, statement);
 }
 
 twoflower::Brochure::Resources::const_iterator
@@ -120,7 +129,8 @@ twoflower::Brochure::Resources::end() const
 	return const_iterator();
 }
 
-twoflower::Brochure::Resources::const_iterator::const_iterator(Statement& statement) :
+twoflower::Brochure::Resources::const_iterator::const_iterator(const Brochure& brochure, Statement& statement) :
+	brochure(&brochure),
 	statement(new Statement(statement)),
 	end(false)
 {
@@ -193,8 +203,8 @@ void twoflower::Brochure::Resources::const_iterator::next()
 		statement->get("name", name);
 		builder.set_name(name);
 
-		std::string type;
-		statement->get("resource_type", type);
-		builder.set_type(type);
+		int resource_type;
+		statement->get("resource_type", resource_type);
+		builder.set_type(brochure->get_resource_type(resource_type));
 	}
 }

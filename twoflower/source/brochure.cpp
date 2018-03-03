@@ -30,13 +30,31 @@ twoflower::Brochure::Builder twoflower::Brochure::builder()
 	return Builder(*this);
 }
 
-bool twoflower::Brochure::has_resource_type(const std::string& name) const
+bool twoflower::Brochure::has_resource_type(int id) const
 {
 	auto statement = database->create_statement(
-		"SELECT * FROM ResourceType WHERE name=?;");
-	statement.bind(1, name);
+		"SELECT * FROM ResourceType WHERE id=?;");
+	statement.bind(1, id);
 
 	return statement.execute() != 0;
+}
+
+twoflower::Resource::Type twoflower::Brochure::get_resource_type(int id) const
+{
+	auto statement = database->create_statement(
+		"SELECT name FROM ResourceType WHERE id=?;");
+	statement.bind(1, id);
+
+	if (statement.execute() != 1)
+	{
+		throw std::runtime_error("resource type not in brochure");
+	}
+
+	Resource::Type type;
+	type.id = id;
+	statement.get(1, type.name);
+
+	return type;
 }
 
 bool twoflower::Brochure::has_action_definition(
@@ -223,14 +241,15 @@ void twoflower::Brochure::make_tables()
 	create_table(action_definition);
 
 	Table resource_type("ResourceType");
-	resource_type.add_primary_key("name", Table::Type::text);
+	resource_type.add_primary_key("id", Table::Type::integer);
+	resource_type.add_column("name", Table::Type::text, false);
 	create_table(resource_type);
 
 	Table resource("Resource");
 	resource.add_primary_key("id", Table::Type::integer);
-	resource.add_column("resource_type", Table::Type::text, false);
+	resource.add_column("resource_type", Table::Type::integer, false);
 	resource.add_column("name", Table::Type::text, true);
-	resource.bind_foreign_key("ResourceType", "resource_type", "name");
+	resource.bind_foreign_key("ResourceType", "resource_type", "id");
 	create_table(resource);
 
 	Table tag("ResourceTag");

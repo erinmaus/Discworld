@@ -19,33 +19,45 @@ twoflower::Brochure::Builder::Builder(Brochure& brochure) :
 	// Nothing.
 }
 
-void twoflower::Brochure::Builder::add_resource_type(const std::string& name)
+twoflower::Resource::Type twoflower::Brochure::Builder::add_resource_type(const std::string& name)
 {
-	if (brochure->has_resource_type(name))
-	{
-		throw std::runtime_error("already has resource type; cannot add");
-	}
-
 	auto statement = brochure->database->create_statement(
 		"INSERT INTO ResourceType(name) VALUES(?);");
 	statement.bind(1, name);
 	statement.execute();
+
+
+	auto id_statement = brochure->database->create_statement("SELECT last_insert_rowid();");
+	statement.execute();
+
+	Resource::Type result;
+	statement.get(0, result.id);
+	result.name = name;
+
+	return result;
 }
 
-void twoflower::Brochure::Builder::remove_resource_type(const std::string& name)
+void twoflower::Brochure::Builder::remove_resource_type(const Resource::Type& type)
 {
+	auto resources_begin = brochure->resources().by_type(type);
+	auto resources_end = brochure->resources().end();
+	for (auto i = resources_begin; i != resources_end; ++i)
+	{
+		remove_resource(*i);
+	}
+
 	auto statement = brochure->database->create_statement(
-		"DELETE FROM ResourceType WHERE name=?;");
-	statement.bind(1, name);
+		"DELETE FROM ResourceType WHERE id=?;");
+	statement.bind(1, type.id);
 	statement.execute();
 }
 
 twoflower::Resource twoflower::Brochure::Builder::add_resource(const Resource& resource)
 {
-	if (!brochure->has_resource_type(resource.get_type()))
+	if (!brochure->has_resource_type(resource.get_type().id))
 	{
 		std::string message = "missing resource type: ";
-		message += resource.get_type();
+		message += resource.get_type().name;
 		throw std::runtime_error(message);
 	}
 
@@ -56,7 +68,7 @@ twoflower::Resource twoflower::Brochure::Builder::add_resource(const Resource& r
 	{
 		statement.bind(1, resource.get_name());
 	}
-	statement.bind(2, resource.get_type());
+	statement.bind(2, resource.get_type().id);
 	statement.execute();
 
 	Resource result = resource;
@@ -90,7 +102,7 @@ void twoflower::Brochure::Builder::update_resource(const Resource& resource)
 	{
 		statement.bind(":name", resource.get_name());
 	}
-	statement.bind(":type", resource.get_type());
+	statement.bind(":type", resource.get_type().id);
 	statement.bind(":id", resource.get_id());
 	statement.execute();
 }

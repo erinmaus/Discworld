@@ -23,7 +23,7 @@ const std::string& twoflower::Resource::get_name() const
 	return name;
 }
 
-const std::string& twoflower::Resource::get_type() const
+const twoflower::Resource::Type& twoflower::Resource::get_type() const
 {
 	return type;
 }
@@ -39,7 +39,7 @@ void twoflower::Resource::Builder::set_id(int value)
 	resource->id = value;
 }
 
-void twoflower::Resource::Builder::set_type(const std::string& value)
+void twoflower::Resource::Builder::set_type(const Type& value)
 {
 	resource->type = value;
 }

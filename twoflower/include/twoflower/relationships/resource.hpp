@@ -22,13 +22,19 @@ namespace twoflower
 		class Builder;
 		Builder builder();
 
+		struct Type
+		{
+			int id;
+			std::string name;
+		};
+
 		int get_id() const;
 		const std::string& get_name() const;
-		const std::string& get_type() const;
+		const Type& get_type() const;
 
 	private:
 		int id = 0;
-		std::string type;
+		Type type;
 		std::string name;
 	};
 
@@ -38,7 +44,7 @@ namespace twoflower
 		Builder(Resource& resource);
 
 		void set_id(int value);
-		void set_type(const std::string& value);
+		void set_type(const Type& value);
 		void set_name(const std::string& value);
 
 	private:

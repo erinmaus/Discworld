@@ -34,7 +34,9 @@ namespace twoflower
 
 		Builder builder();
 
-		bool has_resource_type(const std::string& name) const;
+		bool has_resource_type(int id) const;
+		Resource::Type get_resource_type(int id) const;
+
 		bool has_action_definition(const std::string& type, const std::string& name) const;
 
 		bool get_userdata(
@@ -96,8 +98,8 @@ namespace twoflower
 	public:
 		Builder(Brochure& brochure);
 
-		void add_resource_type(const std::string& name);
-		void remove_resource_type(const std::string& name);
+		Resource::Type add_resource_type(const std::string& name);
+		void remove_resource_type(const Resource::Type& name);
 
 		Resource add_resource(const Resource& resource);
 		void update_resource(const Resource& resource);
@@ -154,7 +156,8 @@ namespace twoflower
 		const_iterator by_fuzzy_name(
 			const std::string& name,
 			const std::string& type = std::string()) const;
-		const_iterator by_type(const std::string& type) const;
+		const_iterator by_type(const Resource::Type& type) const;
+		const_iterator by_type(int type) const;
 
 		bool has(const Resource& resource) const;
 		bool has(int id) const;
@@ -191,9 +194,10 @@ namespace twoflower
 		value_type operator *() const;
 
 	private:
-		explicit const_iterator(Statement& statement);
+		explicit const_iterator(const Brochure& brochure, Statement& statement);
 		void next();
 
+		const Brochure* brochure;
 		std::shared_ptr<Statement> statement;
 		bool end = true;
 		Resource value;
