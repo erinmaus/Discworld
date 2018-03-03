@@ -79,6 +79,7 @@ namespace mapp
 			const std::string& name,
 			bool getter);
 		void ensure_resource_type(const std::string& type);
+		twoflower::Resource::Type get_resource_type(const std::string& name) const;
 
 		bool get_buy_actions(
 			const Shop& shop,

@@ -65,7 +65,7 @@ float mapp::BriggsWizard::reduce(const twoflower::Action& action, float quantity
 
 bool mapp::BriggsWizard::has(const twoflower::Resource& resource, float quantity) const
 {
-	if (resource.get_type() == "location")
+	if (resource.get_type().name == "location")
 	{
 		return true;
 	}
@@ -75,7 +75,7 @@ bool mapp::BriggsWizard::has(const twoflower::Resource& resource, float quantity
 
 float mapp::BriggsWizard::count(const twoflower::Resource& resource) const
 {
-	if (resource.get_type() == "location")
+	if (resource.get_type().name == "location")
 	{
 		return HUGE_VALF;
 	}

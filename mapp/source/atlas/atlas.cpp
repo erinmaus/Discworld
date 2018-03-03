@@ -270,7 +270,7 @@ mapp::Location mapp::Atlas::add(const LocationDefinition& definition)
 mapp::Location mapp::Atlas::add(const LocationDefinition& definition, const Location& parent)
 {
 	Location result;
-	result.resource.builder().set_type("location");
+	result.resource.builder().set_type(get_resource_type("location"));
 	result.resource.builder().set_name(definition.name);
 
 	result.resource = brochure->builder().add_resource(result.resource);
@@ -379,7 +379,7 @@ mapp::Location mapp::Atlas::update(const Location& location, const LocationDefin
 mapp::Amenity mapp::Atlas::add(const AmenityDefinition& amenity, const Location& parent)
 {
 	Amenity result;
-	result.resource.builder().set_type("amenity");
+	result.resource.builder().set_type(get_resource_type("amenity"));
 	result.resource.builder().set_name(amenity.name);
 	result.resource = brochure->builder().add_resource(result.resource);
 
@@ -444,12 +444,13 @@ bool mapp::Atlas::parent(
 	auto iter = actions.by_type("travel", "parent");
 	auto end = actions.end();
 
+	auto location_resource_id = get_resource_type("location").id;
 	while (iter != end)
 	{
 		auto requirements = brochure->requirements(*iter);
 		for (auto requirement: requirements)
 		{
-			if (requirement.get_resource().get_type() == "location")
+			if (requirement.get_resource().get_type().id != location_resource_id)
 			{
 				if (location(requirement.get_resource(), result))
 				{
@@ -478,13 +479,15 @@ mapp::Locations mapp::Atlas::children(const Location& location) const
 	auto iter = actions.by_type("travel", "child");
 	auto end = actions.end();
 
+	auto location_resource_id = get_resource_type("location").id;
+
 	Locations results;
 	while (iter != end)
 	{
 		auto requirements = brochure->requirements(*iter);
 		for (auto requirement: requirements)
 		{
-			if (requirement.get_resource().get_type() == "location")
+			if (requirement.get_resource().get_type().id == location_resource_id)
 			{
 				Location result;
 				if (!this->location(requirement.get_resource(), result))
@@ -561,7 +564,7 @@ bool mapp::Atlas::location(const twoflower::Resource& resource, Location& result
 
 bool mapp::Atlas::amenity(const twoflower::Resource& resource, Amenity& result) const
 {
-	if (resource.get_type() == "amenity")
+	if (resource.get_type().id == get_resource_type("amenity").id)
 	{
 		result.resource = resource;
 		return true;
@@ -576,6 +579,8 @@ mapp::Amenities mapp::Atlas::amenities(const Location& location) const
 	auto current = actions.by_type("travel", "amenity");
 	auto end = actions.end();
 
+	auto amenity_resource_id = get_resource_type("amenity").id;
+
 	Amenities results;
 	while (current != end)
 	{
@@ -583,7 +588,7 @@ mapp::Amenities mapp::Atlas::amenities(const Location& location) const
 		auto requirements = brochure->requirements(*current);
 		for (auto requirement: requirements)
 		{
-			if (requirement.get_resource().get_type() == "amenity" &&
+			if (requirement.get_resource().get_type().id == amenity_resource_id &&
 				amenity(requirement.get_resource(), result))
 			{
 				break;
@@ -697,9 +702,10 @@ bool mapp::Atlas::destination(const twoflower::Action& action, Location& result)
 {
 	auto requirements = brochure->requirements(action);
 
+	auto location_resource_id = get_resource_type("location").id;
 	for (auto requirement: requirements)
 	{
-		if (requirement.get_resource().get_type() == "location" &&
+		if (requirement.get_resource().get_type().id == location_resource_id &&
 			location(requirement.get_resource(), result))
 		{
 			return true;
@@ -749,10 +755,27 @@ void mapp::Atlas::ensure_action_definition(const std::string& type, bool getter)
 
 void mapp::Atlas::ensure_resource_type(const std::string& type)
 {
-	if (!brochure->has_resource_type(type))
+	auto resource_types = brochure->get_resource_types(type);
+	if (resource_types.empty())
 	{
 		brochure->builder().add_resource_type(type);
 	}
+}
+
+twoflower::Resource::Type mapp::Atlas::get_resource_type(const std::string& type) const
+{
+	auto resource_types = brochure->get_resource_types(type);
+	if (resource_types.empty())
+	{
+		throw std::runtime_error("resource type not found");
+	}
+
+	if (resource_types.size() != 1)
+	{
+		throw std::runtime_error("multiple resource types found");
+	}
+
+	return resource_types[0];
 }
 
 void mapp::Atlas::ensure_root_location()
@@ -763,7 +786,7 @@ void mapp::Atlas::ensure_root_location()
 	{
 		twoflower::Resource root_definition;
 		root_definition.builder().set_name("RS");
-		root_definition.builder().set_type("location");
+		root_definition.builder().set_type(get_resource_type("location"));
 
 		root = brochure->builder().add_resource(root_definition);
 	}

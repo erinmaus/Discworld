@@ -72,6 +72,7 @@ namespace mapp
 	private:
 		void ensure_action_definition(const std::string& type, bool getter);
 		void ensure_resource_type(const std::string& type);
+		twoflower::Resource::Type get_resource_type(const std::string& type) const;
 		void ensure_root_location();
 
 		void recompute_bounds(const Location& location);

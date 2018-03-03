@@ -110,7 +110,7 @@ mapp::Game::Game(twoflower::Brochure& brochure) :
 mapp::Item mapp::Game::add(const ItemDefinition& item)
 {
 	Item result;
-	result.resource.builder().set_type("item");
+	result.resource.builder().set_type(get_resource_type("item"));
 	result.resource.builder().set_name(item.name);
 	result.resource = brochure->builder().add_resource(result.resource);
 
@@ -177,7 +177,7 @@ mapp::Item mapp::Game::update(const Item& item, const ItemDefinition& definition
 
 bool mapp::Game::item(const twoflower::Resource& resource, Item& result) const
 {
-	if (resource.get_type() != "item")
+	if (resource.get_type().id != get_resource_type("item").id)
 	{
 		return false;
 	}
@@ -205,7 +205,7 @@ bool mapp::Game::item(const twoflower::Resource& resource, Item& result) const
 mapp::Currency mapp::Game::add(const CurrencyDefinition& currency)
 {
 	Currency result;
-	result.resource.builder().set_type("currency");
+	result.resource.builder().set_type(get_resource_type("currency"));
 	result.resource.builder().set_name(currency.name);
 
 	result.resource = brochure->builder().add_resource(result.resource);
@@ -231,7 +231,7 @@ mapp::Currency mapp::Game::update(const Currency& currency, const CurrencyDefini
 
 bool mapp::Game::currency(const twoflower::Resource& resource, Currency& result) const
 {
-	if (resource.get_type() != "currency")
+	if (resource.get_type().id != get_resource_type("currency").id)
 	{
 		return false;
 	}
@@ -245,7 +245,7 @@ mapp::Currency mapp::Game::currency(const std::string& name) const
 	auto resources = brochure->resources();
 	for (auto i = resources.by_name(name); i != resources.end(); ++i)
 	{
-		if (i->get_type() == "currency")
+		if (i->get_type().id == get_resource_type("currency").id)
 		{
 			mapp::Currency result;
 			if (currency(*i, result))
@@ -261,7 +261,7 @@ mapp::Currency mapp::Game::currency(const std::string& name) const
 mapp::Skill mapp::Game::add(const SkillDefinition& skill)
 {
 	Skill result;
-	result.resource.builder().set_type("skill");
+	result.resource.builder().set_type(get_resource_type("skill"));
 	result.resource.builder().set_name(skill.name);
 
 	result.resource = brochure->builder().add_resource(result.resource);
@@ -287,7 +287,7 @@ mapp::Skill mapp::Game::update(const Skill& skill, const SkillDefinition& defini
 
 bool mapp::Game::skill(const twoflower::Resource& resource, Skill& result) const
 {
-	if (resource.get_type() != "skill")
+	if (resource.get_type().id != get_resource_type("skill").id)
 	{
 		return false;
 	}
@@ -301,7 +301,7 @@ mapp::Skill mapp::Game::skill(const std::string& name) const
 	auto resources = brochure->resources();
 	for (auto i = resources.by_name(name); i != resources.end(); ++i)
 	{
-		if (i->get_type() == "skill")
+		if (i->get_type().id == get_resource_type("skill").id)
 		{
 			mapp::Skill result;
 			if (skill(*i, result))
@@ -317,7 +317,7 @@ mapp::Skill mapp::Game::skill(const std::string& name) const
 mapp::Ability mapp::Game::add(const AbilityDefinition& ability)
 {
 	Ability result;
-	result.resource.builder().set_type("ability");
+	result.resource.builder().set_type(get_resource_type("ability"));
 	result.resource.builder().set_name(ability.name);
 
 	result.resource = brochure->builder().add_resource(result.resource);
@@ -343,7 +343,7 @@ mapp::Ability mapp::Game::update(const Ability& ability, const AbilityDefinition
 
 bool mapp::Game::ability(const twoflower::Resource& resource, Ability& result) const
 {
-	if (resource.get_type() != "ability")
+	if (resource.get_type().id != get_resource_type("ability").id)
 	{
 		return false;
 	}
@@ -357,7 +357,7 @@ mapp::Ability mapp::Game::ability(const std::string& name) const
 	auto resources = brochure->resources();
 	for (auto i = resources.by_name(name); i != resources.end(); ++i)
 	{
-		if (i->get_type() == "ability")
+		if (i->get_type().id == get_resource_type("ability").id)
 		{
 			mapp::Ability result;
 			if (ability(*i, result))
@@ -373,7 +373,7 @@ mapp::Ability mapp::Game::ability(const std::string& name) const
 mapp::Quest mapp::Game::add(const QuestDefinition& quest)
 {
 	Quest result;
-	result.resource.builder().set_type("quest");
+	result.resource.builder().set_type(get_resource_type("quest"));
 	result.resource.builder().set_name(quest.name);
 
 	result.resource = brochure->builder().add_resource(result.resource);
@@ -399,7 +399,7 @@ mapp::Quest mapp::Game::update(const Quest& quest, const QuestDefinition& defini
 
 bool mapp::Game::quest(const twoflower::Resource& resource, Quest& result) const
 {
-	if (resource.get_type() != "quest")
+	if (resource.get_type().id != get_resource_type("quest").id)
 	{
 		return false;
 	}
@@ -413,7 +413,7 @@ mapp::Quest mapp::Game::quest(const std::string& name) const
 	auto resources = brochure->resources();
 	for (auto i = resources.by_name(name); i != resources.end(); ++i)
 	{
-		if (i->get_type() == "quest")
+		if (i->get_type().id == get_resource_type("quest").id)
 		{
 			mapp::Quest result;
 			if (quest(*i, result))
@@ -429,7 +429,7 @@ mapp::Quest mapp::Game::quest(const std::string& name) const
 mapp::Shop mapp::Game::add(const ShopDefinition& shop)
 {
 	Shop result;
-	result.resource.builder().set_type("shop");
+	result.resource.builder().set_type(get_resource_type("shop"));
 	result.resource.builder().set_name(shop.name);
 
 	result.resource = brochure->builder().add_resource(result.resource);
@@ -531,7 +531,7 @@ mapp::Shop mapp::Game::update(const Shop& shop, const ShopDefinition& definition
 
 bool mapp::Game::shop(const twoflower::Resource& resource, Shop& result) const
 {
-	if (resource.get_type() != "shop")
+	if (resource.get_type().id != get_resource_type("shop").id)
 	{
 		return false;
 	}
@@ -561,7 +561,7 @@ mapp::Shops mapp::Game::shops(const Item& item) const
 		auto requirements = brochure->requirements(*current);
 		for (auto requirement: requirements)
 		{
-			if (requirement.get_resource().get_type() == "shop")
+			if (requirement.get_resource().get_type().id == get_resource_type("shop").id)
 			{
 				Shop result;
 				if (shop(requirement.get_resource(), result))
@@ -595,7 +595,7 @@ mapp::Items mapp::Game::inventory(const Shop& shop) const
 		auto requirements = brochure->requirements(*current);
 		for (auto requirement: requirements)
 		{
-			if (requirement.get_resource().get_type() == "item")
+			if (requirement.get_resource().get_type().id == get_resource_type("item").id)
 			{
 				Item result;
 				if (item(requirement.get_resource(), result))
@@ -635,7 +635,7 @@ void mapp::Game::add(const Shop& shop, const Item& item, int quantity)
 	else
 	{
 		twoflower::Resource inventory_resource;
-		inventory_resource.builder().set_type("shop_inventory");
+		inventory_resource.builder().set_type(get_resource_type("shop_inventory"));
 		inventory_resource.builder().set_name(
 			shop.resource.get_name() + "::" + item.resource.get_name());
 		inventory_resource = brochure->builder().add_resource(inventory_resource);
@@ -732,10 +732,11 @@ mapp::ShopPrice mapp::Game::price(const Shop& shop, const Item& item)
 			continue;
 		}
 
+		auto currency_resource_id = get_resource_type("currency").id;
 		for (auto requirement: requirements)
 		{
 			Price result;
-			if (requirement.get_resource().get_type() == "currency" &&
+			if (requirement.get_resource().get_type().id == currency_resource_id &&
 				currency(requirement.get_resource(), result.second))
 			{
 				result.first = requirement.get_count();
@@ -869,10 +870,27 @@ void mapp::Game::ensure_action_definition(
 
 void mapp::Game::ensure_resource_type(const std::string& type)
 {
-	if (!brochure->has_resource_type(type))
+	auto resource_types = brochure->get_resource_types(type);
+	if (resource_types.empty())
 	{
 		brochure->builder().add_resource_type(type);
 	}
+}
+
+twoflower::Resource::Type mapp::Game::get_resource_type(const std::string& type) const
+{
+	auto resource_types = brochure->get_resource_types(type);
+	if (resource_types.empty())
+	{
+		throw std::runtime_error("resource type not found");
+	}
+
+	if (resource_types.size() != 1)
+	{
+		throw std::runtime_error("multiple resource types found");
+	}
+
+	return resource_types[0];
 }
 
 bool mapp::Game::get_buy_actions(
@@ -907,7 +925,7 @@ bool mapp::Game::get_buy_actions(
 		bool got_inventory_resource = false;
 		for (auto requirement: requirements)
 		{
-			if (requirement.get_resource().get_type() == "shop_inventory")
+			if (requirement.get_resource().get_type().id == get_resource_type("shop_inventory").id)
 			{
 				pending_inventory_resource = requirement.get_resource();
 				pending_shop_buy_action = *i;
@@ -947,7 +965,7 @@ bool mapp::Game::get_buy_actions(
 		}
 		for (auto requirement: requirements)
 		{
-			if (requirement.get_resource().get_type() == "shop_inventory" &&
+			if (requirement.get_resource().get_type().id == get_resource_type("shop_inventory").id &&
 				requirement.get_resource().get_id() == pending_inventory_resource.get_id())
 			{
 				shop_buy_action = pending_shop_buy_action;
