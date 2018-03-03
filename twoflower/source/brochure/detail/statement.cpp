@@ -14,7 +14,7 @@ twoflower::Brochure::Statement::Statement(sqlite3* database, const std::string& 
 	database(database)
 {
 	sqlite3_stmt* s;
-	auto result = sqlite3_prepare(database, query.c_str(), query.length(), &s, nullptr);
+	auto result = sqlite3_prepare(database, query.c_str(), (int)query.length(), &s, nullptr);
 	if (result != SQLITE_OK)
 	{
 		throw std::runtime_error(sqlite3_errmsg(database));
@@ -80,7 +80,7 @@ void twoflower::Brochure::Statement::bind(int parameter, const std::string& valu
 
 	auto result = sqlite3_bind_text(
 		statement.get(), parameter,
-		value.c_str(), value.length(),
+		value.c_str(), (int)value.length(),
 		SQLITE_TRANSIENT);
 	if (result != SQLITE_OK)
 	{
@@ -102,7 +102,7 @@ void twoflower::Brochure::Statement::bind(int parameter, const std::vector<std::
 
 	auto result = sqlite3_bind_blob(
 		statement.get(), parameter,
-		&value[0], value.size(),
+		&value[0], (int)value.size(),
 		SQLITE_TRANSIENT);
 	if (result != SQLITE_OK)
 	{
@@ -160,7 +160,7 @@ void twoflower::Brochure::Statement::get(const std::string& column, float& value
 
 void twoflower::Brochure::Statement::get(int column, float& value)
 {
-	value = sqlite3_column_double(statement.get(), column);
+	value = (float)sqlite3_column_double(statement.get(), column);
 }
 
 void twoflower::Brochure::Statement::get(const std::string& column, std::string& value)

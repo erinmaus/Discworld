@@ -35,7 +35,7 @@ bool twoflower::GoalPlanner::goal(const Resource& resource, int quantity)
 		neighbors.end(),
 		[this, quantity](auto& a, auto& b)
 		{
-			return this->wizard().cost(a.first, quantity) < this->wizard().cost(b.first, quantity);
+			return this->wizard().cost(a.first, (float)quantity) < this->wizard().cost(b.first, (float)quantity);
 		});
 
 	auto current = neighbors.begin();
@@ -73,11 +73,11 @@ twoflower::GoalPlanner::Step twoflower::GoalPlanner::step(const Action& action, 
 	float iteration_quantity;
 	if (is_stepping)
 	{
-		iteration_quantity = wizard().reduce(action, quantity);
+		iteration_quantity = wizard().reduce(action, (float)quantity);
 	}
 	else
 	{
-		iteration_quantity = quantity;
+		iteration_quantity = (float)quantity;
 	}
 
 	auto requirements = brochure().requirements(action);
@@ -91,17 +91,17 @@ twoflower::GoalPlanner::Step twoflower::GoalPlanner::step(const Action& action, 
 		int q;
 		if (requirement.is_input())
 		{
-			q = std::ceil(requirement.get_count() * iteration_quantity);
+			q = (int)std::ceil(requirement.get_count() * iteration_quantity);
 		}
 		else
 		{
-			q = requirement.get_count();
+			q = (int)requirement.get_count();
 		}
 
-		if (!wizard().has(requirement.get_resource(), q) &&
-			!luggage().has(requirement.get_resource(), q))
+		if (!wizard().has(requirement.get_resource(), (float)q) &&
+			!luggage().has(requirement.get_resource(), (float)q))
 		{
-			auto result = satisfy(requirement, iteration_quantity);
+			auto result = satisfy(requirement, q);
 			if (result != Step::success)
 			{
 				pop();
@@ -127,7 +127,7 @@ twoflower::GoalPlanner::Step twoflower::GoalPlanner::step(const Action& action, 
 
 	plan().add(
 		action,
-		std::ceil(iteration_quantity),
+		(int)std::ceil(iteration_quantity),
 		wizard().cost(action, iteration_quantity));
 
 	if (std::ceil(iteration_quantity) < quantity)
@@ -157,7 +157,7 @@ twoflower::GoalPlanner::Step twoflower::GoalPlanner::satisfy(const Requirement& 
 		neighbors.end(),
 		[this, quantity](auto& a, auto& b)
 		{
-			return this->wizard().cost(a.first, quantity) < this->wizard().cost(b.first, quantity);
+			return this->wizard().cost(a.first, (float)quantity) < this->wizard().cost(b.first, (float)quantity);
 		});
 
 	for (auto& neighbor: neighbors)
@@ -183,7 +183,7 @@ twoflower::GoalPlanner::Step twoflower::GoalPlanner::satisfy(const Requirement& 
 		}
 
 		auto r = requirement.get_count() - (wizard().count(resource) + luggage().count(resource));
-		int q = std::ceil(r / output.get_count());
+		int q = (int)std::ceil(r / output.get_count());
 
 		auto result = step(neighbor.first, q * quantity);
 		if (result != Step::failure)

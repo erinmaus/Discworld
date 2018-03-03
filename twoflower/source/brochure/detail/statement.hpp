@@ -16,7 +16,7 @@
 
 namespace twoflower
 {
-	struct Brochure::Statement
+	class Brochure::Statement
 	{
 	public:
 		Statement(sqlite3* database, const std::string& query);
