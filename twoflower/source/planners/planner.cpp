@@ -6,7 +6,7 @@
 //
 // Copyright [bk]door.maus
 
-#include <algorithm>>
+#include <algorithm>
 #include "planner.hpp"
 
 twoflower::Planner::Planner(const Brochure& brochure, const Wizard& wizard) :
