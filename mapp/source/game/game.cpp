@@ -648,6 +648,7 @@ void mapp::Game::add(const Shop& shop, const Item& item, int quantity)
 
 		twoflower::Requirement inventory_requirement;
 		inventory_requirement.builder().set_is_input(true);
+		inventory_requirement.builder().set_count(1);
 
 		twoflower::Requirement shop_requirement;
 
