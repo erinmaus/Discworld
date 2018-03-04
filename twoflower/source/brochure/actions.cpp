@@ -63,6 +63,7 @@ twoflower::Brochure::Actions::by_name(const std::string& name) const
 
 	auto statement = brochure->database->create_statement(query);
 	statement.bind(":name", name);
+	statement.bind(":resource_id", resource.get_id());
 	return const_iterator(*brochure->database, statement);
 }
 
