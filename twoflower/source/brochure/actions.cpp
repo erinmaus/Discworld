@@ -255,6 +255,7 @@ void twoflower::Brochure::Actions::const_iterator::next()
 			statement->get("id", type.id);
 			statement->get("name", type.name);
 		}
+		builder.set_type(type);
 
 		int getter;
 		if (is_instance)
