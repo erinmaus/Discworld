@@ -431,7 +431,7 @@ twoflower::Action twoflower::Brochure::Builder::connect(
 	}
 
 	auto statement = brochure->database->create_statement(
-		"INSERT INTO ActionInstance(action_id, resource_id) VALUES(?, ?, ?);");
+		"INSERT INTO ActionInstance(action_id, resource_id) VALUES(?, ?);");
 	statement.bind(1, action.get_type().id);
 	statement.bind(2, resource.get_id());
 	statement.execute();
