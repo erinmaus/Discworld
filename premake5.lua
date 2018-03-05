@@ -99,6 +99,9 @@ solution "Discworld"
 			targetdir "bin"
 		configuration {}
 			links { "Twoflower" }
+			links { "libboost_regex" }
+
+		defines { "BOOST_ALL_NO_LIB" }
 
 		location "mapp"
 
