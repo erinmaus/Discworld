@@ -390,6 +390,14 @@ GLOOPER_API twoflower_resource* twoflower_brochure_add_resource(twoflower_brochu
 }
 
 extern "C"
+GLOOPER_API void twoflower_brochure_update_resource(twoflower_brochure* brochure, const twoflower_resource* resource)
+{
+	auto b = (twoflower::Brochure*)brochure;
+	auto r = (const twoflower::Resource*)resource;
+	b->builder().update_resource(*r);
+}
+
+extern "C"
 GLOOPER_API void twoflower_brochure_remove_resource(twoflower_brochure* brochure, const twoflower_resource* resource)
 {
 	auto b = (twoflower::Brochure*)brochure;
@@ -536,13 +544,13 @@ GLOOPER_API void twoflower_brochure_unset_userdata(twoflower_brochure* brochure,
 	b->builder().unset_userdata(*r, field);
 }
 
-
 extern "C"
-GLOOPER_API void twoflower_brochure_add_action_definition(twoflower_brochure* brochure, const twoflower_action* action)
+GLOOPER_API int twoflower_brochure_add_action_definition(twoflower_brochure* brochure, const twoflower_action* action)
 {
 	auto b = (twoflower::Brochure*)brochure;
 	auto a = (const twoflower::Action*)action;
-	b->builder().add_action_definition(*a);
+	auto result = b->builder().add_action_definition(*a);
+	return result.id;
 }
 
 extern "C"

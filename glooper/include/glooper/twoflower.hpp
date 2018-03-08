@@ -85,6 +85,7 @@ GLOOPER_API size_t twoflower_brochure_get_resource_types_count(const twoflower_b
 GLOOPER_API size_t twoflower_brochure_get_resource_types(const twoflower_brochure* brochure, const char* name, int* ids, size_t length);
 GLOOPER_API bool twoflower_brochure_has_action_definition(const twoflower_brochure* brochure, int id);
 GLOOPER_API twoflower_resource* twoflower_brochure_add_resource(twoflower_brochure* brochure, const twoflower_resource* resource);
+GLOOPER_API void twoflower_brochure_update_resource(twoflower_brochure* brochure, const twoflower_resource* resource);
 GLOOPER_API void twoflower_brochure_remove_resource(twoflower_brochure* brochure, const twoflower_resource* resource);
 GLOOPER_API bool twoflower_brochure_get_userdata_int(const twoflower_brochure* brochure, const twoflower_resource* resource, const char* field, int* value);
 GLOOPER_API bool twoflower_brochure_get_userdata_float(const twoflower_brochure* brochure, const twoflower_resource* resource, const char* field, float* value);
@@ -98,7 +99,7 @@ GLOOPER_API void twoflower_brochure_set_userdata_float(twoflower_brochure* broch
 GLOOPER_API void twoflower_brochure_set_userdata_string(twoflower_brochure* brochure, const twoflower_resource* resource, const char* field, const char* value);
 GLOOPER_API void twoflower_brochure_set_userdata_blob(twoflower_brochure* brochure, const twoflower_resource* resource, const char* field, char* value, size_t value_length);
 GLOOPER_API void twoflower_brochure_unset_userdata(twoflower_brochure* brochure, const twoflower_resource* resource, const char* field);
-GLOOPER_API void twoflower_brochure_add_action_definition(twoflower_brochure* brochure, const twoflower_action* action);
+GLOOPER_API int twoflower_brochure_add_action_definition(twoflower_brochure* brochure, const twoflower_action* action);
 GLOOPER_API void twoflower_brochure_update_action(twoflower_brochure* brochure, const twoflower_action* action);
 GLOOPER_API void twoflower_brochure_remove_action(twoflower_brochure* brochure, const twoflower_action* action);
 GLOOPER_API void twoflower_brochure_update_requirement(twoflower_brochure* brochure, const twoflower_requirement* requirement);
