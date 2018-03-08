@@ -120,4 +120,39 @@ solution "Discworld"
 			path.join(_OPTIONS["deps"] or _DEFAULTS["deps"], "lib")
 		}
 
+	project "Glooper"
+		language "C++"
+		kind "SharedLib"
+
+		configuration "Debug"
+			targetsuffix "_debug"
+			objdir "obj/glooper/debug"
+			targetdir "bin"
+		configuration "Release"
+			objdir "obj/glooper/reklease"
+			targetdir "bin"
+		configuration {}
+			links { "Twoflower" }
+			links { "Mapp" }
+			links { "libboost_regex" }
+
+		location "glooper"
+		defines { "GLOOPER_BUILDING_DLL" }
+
+		includedirs {
+			path.join(_OPTIONS["deps"] or _DEFAULTS["deps"], "include"),
+			"glooper/include",
+			"mapp/include",
+			"twoflower/include"
+		}
+
+		files {
+			"glooper/source/**.cpp",
+			"glooper/include/**.hpp"
+		}
+
+		libdirs {
+			path.join(_OPTIONS["deps"] or _DEFAULTS["deps"], "lib")
+		}
+
 	test "basic_item"
