@@ -338,7 +338,7 @@ void twoflower::Brochure::Builder::unset_userdata(
 	statement.execute();
 }
 
-void twoflower::Brochure::Builder::add_action_definition(const Action& action)
+twoflower::Action::Type twoflower::Brochure::Builder::add_action_definition(const Action& action)
 {
 	auto statement = brochure->database->create_statement(
 		"INSERT INTO ActionDefinition(name, getter, task, cost)"
@@ -348,6 +348,15 @@ void twoflower::Brochure::Builder::add_action_definition(const Action& action)
 	statement.bind(3, action.get_task());
 	statement.bind(4, action.get_cost_multiplier());
 	statement.execute();
+
+	auto id_statement = brochure->database->create_statement("SELECT last_insert_rowid();");
+	id_statement.next();
+
+	Action::Type result;
+	id_statement.get(0, result.id);
+	result.name = action.get_type().name;
+
+	return result;
 }
 
 void twoflower::Brochure::Builder::update_action(const Action& action)

@@ -127,7 +127,7 @@ namespace twoflower
 			const std::vector<std::uint8_t>& value);
 		void unset_userdata(const Resource& resource, const std::string& key);
 
-		void add_action_definition(const Action& action);
+		Action::Type add_action_definition(const Action& action);
 		void update_action(const Action& action);
 		void remove_action(const Action& action);
 
