@@ -28,6 +28,15 @@ twoflower::Brochure::Actions::Actions(
 }
 
 twoflower::Brochure::Actions::const_iterator
+twoflower::Brochure::Actions::by_type(int type) const
+{
+	Action::Type t;
+	t.id = type;
+
+	return by_type(t);
+}
+
+twoflower::Brochure::Actions::const_iterator
 twoflower::Brochure::Actions::by_type(const Action::Type& type) const
 {
 	std::string query = "SELECT * FROM ActionInstance WHERE action_id=:action_id";

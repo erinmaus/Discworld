@@ -18,6 +18,15 @@ twoflower::Brochure::Resources::Resources(const Brochure& brochure) :
 }
 
 twoflower::Brochure::Resources::const_iterator
+twoflower::Brochure::Resources::by_name(const std::string& name, int type) const
+{
+	Resource::Type t;
+	t.id = type;
+
+	return by_name(name, t);
+}
+
+twoflower::Brochure::Resources::const_iterator
 twoflower::Brochure::Resources::by_name(const std::string& name, const Resource::Type& type) const
 {
 	if (type.id)
@@ -37,6 +46,15 @@ twoflower::Brochure::Resources::by_name(const std::string& name, const Resource:
 
 		return const_iterator(*brochure, statement);
 	}
+}
+
+twoflower::Brochure::Resources::const_iterator
+twoflower::Brochure::Resources::by_fuzzy_name(const std::string& name, int type) const
+{
+	Resource::Type t;
+	t.id = type;
+
+	return by_fuzzy_name(name, t);
 }
 
 twoflower::Brochure::Resources::const_iterator

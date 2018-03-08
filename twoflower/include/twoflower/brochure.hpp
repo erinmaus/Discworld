@@ -154,9 +154,15 @@ namespace twoflower
 		const_iterator by_name(
 			const std::string& name,
 			const Resource::Type& type = Resource::Type()) const;
+		const_iterator by_name(
+			const std::string& name,
+			int type) const;
 		const_iterator by_fuzzy_name(
 			const std::string& name,
 			const Resource::Type& type = Resource::Type()) const;
+		const_iterator by_fuzzy_name(
+			const std::string& name,
+			int type) const;
 		const_iterator by_type(const Resource::Type& type) const;
 		const_iterator by_type(int type) const;
 
@@ -212,6 +218,7 @@ namespace twoflower
 
 		struct const_iterator;
 		const_iterator by_type(const Action::Type& type) const;
+		const_iterator by_type(int type) const;
 		const_iterator by_name(const std::string& name) const;
 		const_iterator by_name(const std::string& type, const std::string& name) const;
 		const_iterator getters() const;
