@@ -1,15 +1,23 @@
 # Discworld: A goal planner, route finder, and game relation database
-Discworld is composed of two components: **Twoflower** and **Mapp**.
+Discworld is composed of two core components: **Twoflower** and **Mapp**.
 
 **Twoflower** is the core component: it exposes a generic game relation database
-and implements a goal planner (using a depth-first search) and route finder
-(using A\*). The game relation database could be used to map relationships, such
-as the XP rewarded for an action, the resources required to make an item, and so
-on. You're really limited only be how well you can model these relationships in
-a graph.
+(GameDB) and implements a goal planner (using a depth-first search) and route
+finder (using A\*). The GameDB could be used to map relationships, such as the
+XP rewarded for an action, the resources required to make an item, and so on.
+You're really limited only by how well you can model these relationships in a
+graph.
 
-**Mapp** is an extension of **Twoflower** modeling IttleScape, a WIP game
-inspired by *RuneScape* by Jagex.
+**Mapp** is an extension of **Twoflower** modeling *IttleScape*, a WIP game
+inspired by *RuneScape* by Jagex. Only high-level things like shops are
+exposed currently.
+
+**Glooper** is a C wrapper over **Twoflower** and **Mapp**. (There's a pun
+there: glooper, glue-per, glue--Glooper glues Twoflower via FFI. Ok.)
+
+A future C# tool will allow editing of the GameDB. It will use **Glooper** to
+call **Twoflower**. There may be functionality explicitly for *IttleScape*, but
+it will work with any GameDB.
 
 Currently, **Twoflower** and **Mapp** are under heavy refactoring from being
 used in a failed proof-of-concept called *AUTONOMAUS*.
