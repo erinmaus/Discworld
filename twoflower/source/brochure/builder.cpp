@@ -27,10 +27,10 @@ twoflower::Resource::Type twoflower::Brochure::Builder::add_resource_type(const 
 	statement.execute();
 
 	auto id_statement = brochure->database->create_statement("SELECT last_insert_rowid();");
-	id_statement.execute();
+	id_statement.next();
 
 	Resource::Type result;
-	statement.get("id", result.id);
+	id_statement.get(0, result.id);
 	result.name = name;
 
 	return result;
