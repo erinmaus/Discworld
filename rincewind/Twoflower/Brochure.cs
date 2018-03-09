@@ -38,9 +38,19 @@ namespace Dormouse.Rincewind.Twoflower
 			return new Resource(handle, true);
 		}
 
-		public void RemoveResource(Resource resource)
+		public void Remove(Resource resource)
 		{
 			Glooper.twoflower_brochure_remove_resource(mBrochure, resource.Handle);
+		}
+
+		public void Remove(ResourceAction action)
+		{
+			Glooper.twoflower_brochure_remove_action(mBrochure, action.Handle);
+		}
+
+		public void Remove(Requirement requirement)
+		{
+			Glooper.twoflower_brochure_remove_requirement(mBrochure, requirement.Handle);
 		}
 
 		public int AddResourceType(string name)
@@ -61,14 +71,14 @@ namespace Dormouse.Rincewind.Twoflower
 			return System.Runtime.InteropServices.Marshal.PtrToStringAnsi(Glooper.twoflower_brochure_get_resource_type_name(mBrochure, id));
 		}
 
-		public int AddActionDefinition(Action action)
+		public int AddActionDefinition(ResourceAction action)
 		{
 			return Glooper.twoflower_brochure_add_action_definition(mBrochure, action.Handle);
 		}
 
 		public void RemoveActionDefinition(int id)
 		{
-			using (Action actionDefinition = new Action())
+			using (ResourceAction actionDefinition = new ResourceAction())
 			{
 				actionDefinition.TypeID = id;
 				Glooper.twoflower_brochure_remove_action(mBrochure, actionDefinition.Handle);
@@ -80,13 +90,13 @@ namespace Dormouse.Rincewind.Twoflower
 			return Glooper.twoflower_brochure_has_action_definition(mBrochure, id);
 		}
 
-		public Action Connect(Action action, Resource resource)
+		public ResourceAction Connect(ResourceAction action, Resource resource)
 		{
 			var result = Glooper.twoflower_brochure_connect_action(mBrochure, action.Handle, resource.Handle);
-			return new Action(result, true);
+			return new ResourceAction(result, true);
 		}
 
-		public Requirement Connect(Requirement requirement, Action action, Resource resource)
+		public Requirement Connect(Requirement requirement, ResourceAction action, Resource resource)
 		{
 			var result = Glooper.twoflower_brochure_connect_requirement(mBrochure, requirement.Handle, action.Handle, resource.Handle);
 			return new Requirement(result, true);
@@ -97,7 +107,7 @@ namespace Dormouse.Rincewind.Twoflower
 			Glooper.twoflower_brochure_update_resource(mBrochure, resource.Handle);
 		}
 
-		public void Update(Action action)
+		public void Update(ResourceAction action)
 		{
 			Glooper.twoflower_brochure_update_action(mBrochure, action.Handle);
 		}
