@@ -45,14 +45,14 @@ twoflower::Resource::Type twoflower::Brochure::get_resource_type(int id) const
 		"SELECT name FROM ResourceType WHERE id=?;");
 	statement.bind(1, id);
 
-	if (statement.execute() != 1)
+	if (!statement.next())
 	{
 		throw std::runtime_error("resource type not in brochure");
 	}
 
 	Resource::Type type;
 	type.id = id;
-	statement.get(1, type.name);
+	statement.get(0, type.name);
 
 	return type;
 }
