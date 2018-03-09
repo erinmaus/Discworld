@@ -15,9 +15,10 @@ exposed currently.
 **Glooper** is a C wrapper over **Twoflower** and **Mapp**. (There's a pun
 there: glooper, glue-per, glue--Glooper glues Twoflower via FFI. Ok.)
 
-A future C# tool will allow editing of the GameDB. It will use **Glooper** to
-call **Twoflower**. There may be functionality explicitly for *IttleScape*, but
-it will work with any GameDB.
+**Rincewind** is a tool written in C# will allow editing of the GameDB. It will
+use **Glooper** to call **Twoflower**. There may be functionality explicitly
+for *IttleScape*, but it will work with any GameDB. **Rincewind** also includes
+a managed implementation of Mapp.
 
 Currently, **Twoflower** and **Mapp** are under heavy refactoring from being
 used in a failed proof-of-concept called *AUTONOMAUS*.
