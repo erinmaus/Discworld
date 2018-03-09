@@ -18,9 +18,27 @@ namespace Dormouse.Rincewind.Mapp
 			get { return mResource; }
 		}
 
+		public string Name
+		{
+			get { return mResource.Name; }
+			set
+			{
+				if (mResource.Name != value)
+				{
+					mResource.Name = value;
+					Update();
+				}
+			}
+		}
+
 		public bool IsDisposed
 		{
 			get { return mResource == null || mResource.IsDisposed; }
+		}
+
+		public bool IsValid
+		{
+			get { return !IsDisposed && mResource.ID != 0; }
 		}
 
 		Game mGame;
@@ -39,6 +57,25 @@ namespace Dormouse.Rincewind.Mapp
 			mGame = game;
 
 			mResource = new Resource();
+		}
+
+		protected abstract void BeforeUpdate();
+
+		protected void Update()
+		{
+			BeforeUpdate();
+			Game.Brochure.Update(mResource);
+		}
+
+		public void Create()
+		{
+			if (mResource.ID != 0)
+			{
+				throw new InvalidOperationException(String.Format("{0} '#{1}' #{2} is already created.", GetType().Name, Resource.Name, Resource.ID));
+			}
+
+			BeforeUpdate();
+			mResource = Game.Brochure.AddResource(mResource);
 		}
 
 		protected abstract bool TryFromResource(Resource resource);
