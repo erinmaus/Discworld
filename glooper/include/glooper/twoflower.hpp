@@ -113,6 +113,7 @@ GLOOPER_API void twoflower_brochure_add_tag(twoflower_brochure* brochure, const 
 GLOOPER_API void twoflower_brochure_remove_tag(twoflower_brochure* brochure, const twoflower_resource* resource, const char* tag);
 GLOOPER_API twoflower_resource* twoflower_brochure_get_resource_from_action(const twoflower_brochure* brochure, const twoflower_action* action);
 GLOOPER_API twoflower_resources* twoflower_brochure_get_resources(const twoflower_brochure* brochure);
+GLOOPER_API void twoflower_free_resources(twoflower_resources* resources);
 GLOOPER_API twoflower_resources_iterator* twoflower_resources_by_name(const twoflower_resources* resources, const char* name, int type);
 GLOOPER_API twoflower_resources_iterator* twoflower_resources_by_fuzzy_name(const twoflower_resources* resources, const char* name, int type);
 GLOOPER_API twoflower_resources_iterator* twoflower_resources_by_type(const twoflower_resources* resources, int type);
@@ -120,7 +121,7 @@ GLOOPER_API twoflower_resources_iterator* twoflower_resources_begin(const twoflo
 GLOOPER_API twoflower_resources_iterator* twoflower_resources_end(const twoflower_resources* resources);
 GLOOPER_API bool twoflower_resources_has(const twoflower_resources* resources, int id);
 GLOOPER_API twoflower_resource* twoflower_resources_get(const twoflower_resources* resources, int id);
-GLOOPER_API const twoflower_resources* twoflower_resources_iterator_get_value(const twoflower_resources_iterator* iter);
+GLOOPER_API twoflower_resource* twoflower_resources_iterator_get_value(const twoflower_resources_iterator* iter);
 GLOOPER_API void twoflower_resources_iterator_next(twoflower_resources_iterator* iter);
 GLOOPER_API bool twoflower_resources_iterator_equals(const twoflower_resources_iterator* a, const twoflower_resources_iterator* b);
 GLOOPER_API void twoflower_free_resources_iterator(twoflower_resources_iterator* iter);
@@ -136,14 +137,15 @@ GLOOPER_API twoflower_actions_iterator* twoflower_actions_begin(const twoflower_
 GLOOPER_API twoflower_actions_iterator* twoflower_actions_end(const twoflower_actions* actions);
 GLOOPER_API bool twoflower_actions_has(const twoflower_actions* actions, int id);
 GLOOPER_API twoflower_action* twoflower_actions_get(const twoflower_actions* actions, int id);
-GLOOPER_API const twoflower_action* twoflower_actions_iterator_get_value(const twoflower_actions_iterator* iter);
+GLOOPER_API twoflower_action* twoflower_actions_iterator_get_value(const twoflower_actions_iterator* iter);
 GLOOPER_API void twoflower_actions_iterator_next(twoflower_actions_iterator* iter);
 GLOOPER_API bool twoflower_actions_iterator_equals(const twoflower_actions_iterator* a, const twoflower_actions_iterator* b);
 GLOOPER_API void twoflower_free_actions_iterator(twoflower_actions_iterator* iter);
+GLOOPER_API twoflower_requirements* twoflower_brochure_get_requirements(const twoflower_brochure* brochure, const twoflower_action* action);
 GLOOPER_API twoflower_requirements_iterator* twoflower_requirements_begin(const twoflower_requirements* requirements);
 GLOOPER_API twoflower_requirements_iterator* twoflower_requirements_end(const twoflower_requirements* requirements);
 GLOOPER_API void twoflower_free_requirements(twoflower_requirements* requirements);
-GLOOPER_API const twoflower_requirement* twoflower_requirements_iterator_get_value(const twoflower_requirements_iterator* iter);
+GLOOPER_API twoflower_requirement* twoflower_requirements_iterator_get_value(const twoflower_requirements_iterator* iter);
 GLOOPER_API void twoflower_requirements_iterator_next(twoflower_requirements_iterator* iter);
 GLOOPER_API bool twoflower_requirements_iterator_equals(const twoflower_requirements_iterator* a, const twoflower_requirements_iterator* b);
 GLOOPER_API void twoflower_free_requirements_iterator(twoflower_requirements_iterator* iter);

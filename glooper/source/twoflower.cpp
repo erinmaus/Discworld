@@ -682,6 +682,12 @@ GLOOPER_API twoflower_resources* twoflower_brochure_get_resources(const twoflowe
 }
 
 extern "C"
+GLOOPER_API void twoflower_free_resources(twoflower_resources* resources)
+{
+	delete (twoflower::Brochure::Resources*)resources;
+}
+
+extern "C"
 GLOOPER_API twoflower_resources_iterator* twoflower_resources_by_name(const twoflower_resources* resources, const char* name, int type)
 {
 	auto r = (const twoflower::Brochure::Resources*)resources;
@@ -738,10 +744,11 @@ GLOOPER_API twoflower_resource* twoflower_resources_get(const twoflower_resource
 
 
 extern "C"
-GLOOPER_API const twoflower_resources* twoflower_resources_iterator_get_value(const twoflower_resources_iterator* iter)
+GLOOPER_API twoflower_resource* twoflower_resources_iterator_get_value(const twoflower_resources_iterator* iter)
 {
 	auto i = (const twoflower::Brochure::Resources::const_iterator*)iter;
-	return (const twoflower_resources*)&(*i);
+	auto result = new	twoflower::Resource(**i);
+	return (twoflower_resource*)result;
 }
 
 extern "C"
@@ -870,10 +877,11 @@ GLOOPER_API twoflower_action* twoflower_actions_get(const twoflower_actions* act
 }
 
 extern "C"
-GLOOPER_API const twoflower_action* twoflower_actions_iterator_get_value(const twoflower_actions_iterator* iter)
+GLOOPER_API twoflower_action* twoflower_actions_iterator_get_value(const twoflower_actions_iterator* iter)
 {
 	auto i = (const twoflower::Brochure::Actions::const_iterator*)iter;
-	return (const twoflower_action*)&(*i);
+	auto result = new	twoflower::Action(**i);
+	return (twoflower_action*)result;
 }
 
 extern "C"
@@ -898,7 +906,7 @@ GLOOPER_API void twoflower_free_actions_iterator(twoflower_actions_iterator* ite
 }
 
 extern "C"
-twoflower_requirements* twoflower_brochure_get_requirements(const twoflower_brochure* brochure, const twoflower_action* action)
+GLOOPER_API twoflower_requirements* twoflower_brochure_get_requirements(const twoflower_brochure* brochure, const twoflower_action* action)
 {
 	auto b = (const twoflower::Brochure*)brochure;
 	auto a = (const twoflower::Action*)action;
@@ -928,10 +936,11 @@ GLOOPER_API void twoflower_free_requirements(twoflower_requirements* requirement
 	delete (twoflower::Brochure::Requirements*)requirements;
 }
 extern "C"
-GLOOPER_API const twoflower_requirement* twoflower_requirements_iterator_get_value(const twoflower_requirements_iterator* iter)
+GLOOPER_API twoflower_requirement* twoflower_requirements_iterator_get_value(const twoflower_requirements_iterator* iter)
 {
 	auto i = (const twoflower::Brochure::Requirements::const_iterator*)iter;
-	return (const twoflower_requirement*)&(*i);
+	auto result = new	twoflower::Requirement(**i);
+	return (twoflower_requirement*)result;
 }
 
 extern "C"
