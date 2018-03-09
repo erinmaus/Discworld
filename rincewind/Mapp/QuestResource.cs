@@ -99,7 +99,7 @@ namespace Dormouse.Rincewind.Mapp
 					{
 						if (finalStepResource != null)
 						{
-							throw new InvalidOperationException(String.Format("Multiple final steps for QuestResource {0} (#{1}) complete action (#{2}).", resource.Name, resource.ID, action.ID)));
+							throw new InvalidOperationException(String.Format("Multiple final steps for QuestResource {0} (#{1}) complete action (#{2}).", resource.Name, resource.ID, action.ID));
 						}
 
 						if (requirement.IsInput || requirement.IsOutput)

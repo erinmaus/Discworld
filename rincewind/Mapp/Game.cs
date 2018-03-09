@@ -98,7 +98,7 @@ namespace Dormouse.Rincewind.Mapp
 			if (types.Length == 0)
 			{
 				int id = mBrochure.AddResourceType(name);
-				mResourceTypeIDs.Add(name, types[0]);
+				mResourceTypeIDs.Add(name, id);
 			}
 			else if (types.Length == 1)
 			{
