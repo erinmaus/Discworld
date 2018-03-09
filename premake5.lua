@@ -23,6 +23,7 @@ function test(name)
 		configuration {}
 			links { "Mapp" }
 			links { "Twoflower" }
+			runtime "release"
 
 		location(path.join("test", name))
 
@@ -68,6 +69,7 @@ solution "Discworld"
 			objdir "obj/twoflower/release"
 			targetdir "bin"
 		configuration {}
+			runtime "release"
 
 		location "twoflower"
 
@@ -100,6 +102,7 @@ solution "Discworld"
 		configuration {}
 			links { "Twoflower" }
 			links { "libboost_regex" }
+			runtime "release"
 
 		defines { "BOOST_ALL_NO_LIB" }
 
@@ -135,6 +138,7 @@ solution "Discworld"
 			links { "Twoflower" }
 			links { "Mapp" }
 			links { "libboost_regex" }
+			runtime "release"
 
 		location "glooper"
 		defines { "GLOOPER_BUILDING_DLL" }
@@ -153,6 +157,31 @@ solution "Discworld"
 
 		libdirs {
 			path.join(_OPTIONS["deps"] or _DEFAULTS["deps"], "lib")
+		}
+
+	project "Rincewind"
+		language "C#"
+		kind "WindowedApp"
+
+		configuration "Debug"
+			targetsuffix "_debug"
+			objdir "obj/rincewind/debug"
+			targetdir "bin"
+			defines { "RINCEWIND_DEBUG" }
+		configuration "Release"
+			objdir "obj/rincewind/release"
+			targetdir "bin"
+			defines { "RINCEWIND_RELEASE" }
+		configuration {}
+			links { "System" }
+			links { "System.Windows.Forms" }
+
+		namespace "Dormouse.Rincewind"
+
+		location "rincewind"
+
+		files {
+			"rincewind/**.cs"
 		}
 
 	test "basic_item"
