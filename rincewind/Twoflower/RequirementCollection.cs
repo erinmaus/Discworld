@@ -29,7 +29,7 @@ namespace Dormouse.Rincewind.Twoflower
 			get { return mRequirements == IntPtr.Zero; }
 		}
 
-		public RequirementCollection(Brochure brochure, Action action)
+		public RequirementCollection(Brochure brochure, ResourceAction action)
 		{
 			mRequirements = Glooper.twoflower_brochure_get_requirements(brochure.Handle, action.Handle);
 			mIsManaged = true;
@@ -73,6 +73,16 @@ namespace Dormouse.Rincewind.Twoflower
 			Func<IntPtr> begin = () => Glooper.twoflower_requirements_begin(mRequirements);
 			Func<IntPtr> end = () => Glooper.twoflower_requirements_end(mRequirements);
 			return new RequirementQuery(begin, end);
+		}
+
+		public IEnumerable<Requirement> Outputs()
+		{
+			return All().Where(r => r.IsOutput);
+		}
+
+		public IEnumerable<Requirement> Inputs()
+		{
+			return All().Where(r => r.IsInput);
 		}
 
 		public void Dispose()
