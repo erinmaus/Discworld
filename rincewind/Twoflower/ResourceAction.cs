@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 
 namespace Dormouse.Rincewind.Twoflower
 {
-	public class Action : IDisposable
+	public class ResourceAction : IDisposable
 	{
 		IntPtr mAction;
 		bool mIsManaged;
@@ -75,19 +75,19 @@ namespace Dormouse.Rincewind.Twoflower
 			set { Glooper.twoflower_action_set_type_name(mAction, value); }
 		}
 
-		public Action()
+		public ResourceAction()
 		{
 			mAction = Glooper.twoflower_create_action();
 			mIsManaged = true;
 		}
 
-		public Action(IntPtr action, bool isManaged = false)
+		public ResourceAction(IntPtr action, bool isManaged = false)
 		{
 			mAction = action;
 			mIsManaged = isManaged;
 		}
 
-		~Action()
+		~ResourceAction()
 		{
 			Dispose();
 		}

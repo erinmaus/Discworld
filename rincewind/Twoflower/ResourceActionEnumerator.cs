@@ -11,12 +11,12 @@ using System.Collections.Generic;
 
 namespace Dormouse.Rincewind.Twoflower
 {
-	public class ActionEnumerator : IEnumerator<Action>
+	public class ResourceActionEnumerator : IEnumerator<ResourceAction>
 	{
 		IntPtr mIterator, mEndIterator;
 
-		Action mCurrent;
-		public Action Current
+		ResourceAction mCurrent;
+		public ResourceAction Current
 		{
 			get { return mCurrent; }
 		}
@@ -26,13 +26,13 @@ namespace Dormouse.Rincewind.Twoflower
 			get { return mCurrent; }
 		}
 
-		public ActionEnumerator(IntPtr begin, IntPtr end)
+		public ResourceActionEnumerator(IntPtr begin, IntPtr end)
 		{
 			mIterator = begin;
 			mEndIterator = end;
 		}
 
-		~ActionEnumerator()
+		~ResourceActionEnumerator()
 		{
 			Dispose();
 		}
@@ -63,7 +63,7 @@ namespace Dormouse.Rincewind.Twoflower
 
 			if (!Glooper.twoflower_actions_iterator_equals(mIterator, mEndIterator))
 			{
-				mCurrent = new Action(Glooper.twoflower_actions_iterator_get_value(mIterator), true);
+				mCurrent = new ResourceAction(Glooper.twoflower_actions_iterator_get_value(mIterator), true);
 				Glooper.twoflower_actions_iterator_next(mIterator);
 				return true;
 			}
