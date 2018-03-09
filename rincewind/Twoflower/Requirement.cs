@@ -48,9 +48,9 @@ namespace Dormouse.Rincewind.Twoflower
 			set { Glooper.twoflower_requirement_set_resource(mRequirement, value.Handle); }
 		}
 
-		public Action Action
+		public ResourceAction Action
 		{
-			get { return new Action(Glooper.twoflower_requirement_get_action(mRequirement)); }
+			get { return new ResourceAction(Glooper.twoflower_requirement_get_action(mRequirement)); }
 			set { Glooper.twoflower_requirement_set_action(mRequirement, value.Handle); }
 		}
 

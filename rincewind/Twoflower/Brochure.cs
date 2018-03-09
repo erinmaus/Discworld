@@ -56,6 +56,11 @@ namespace Dormouse.Rincewind.Twoflower
 			return result;
 		}
 
+		public string GetResourceTypeName(int id)
+		{
+			return System.Runtime.InteropServices.Marshal.PtrToStringAnsi(Glooper.twoflower_brochure_get_resource_type_name(mBrochure, id));
+		}
+
 		public int AddActionDefinition(Action action)
 		{
 			return Glooper.twoflower_brochure_add_action_definition(mBrochure, action.Handle);
