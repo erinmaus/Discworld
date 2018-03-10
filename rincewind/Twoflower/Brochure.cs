@@ -38,6 +38,89 @@ namespace Dormouse.Rincewind.Twoflower
 			return new Resource(handle, true);
 		}
 
+		public int? GetUserdataInt32(Resource resource, string field)
+		{
+			unsafe
+			{
+				int value;
+				if (Glooper.twoflower_brochure_get_userdata_int(mBrochure, resource.Handle, field, &value))
+				{
+					return value;
+				}
+
+				return null;
+			}
+		}
+
+		public void SetUserdata(Resource resource, string field, int value)
+		{
+			Glooper.twoflower_brochure_set_userdata_int(resource.Handle, resource.Handle, field, value);
+		}
+
+		public float? GetUserdataSingle(Resource resource, string field)
+		{
+			unsafe
+			{
+				float value;
+				if (Glooper.twoflower_brochure_get_userdata_float(mBrochure, resource.Handle, field, &value))
+				{
+					return value;
+				}
+
+				return null;
+			}
+		}
+
+		public void SetUserdata(Resource resource, string field, float value)
+		{
+			Glooper.twoflower_brochure_set_userdata_float(mBrochure, resource.Handle, field, value);
+		}
+
+		public string GetUserdataString(Resource resource, string field)
+		{
+			IntPtr size = IntPtr.Zero;
+			if (Glooper.twoflower_brochure_get_userdata_string_length(mBrochure, resource.Handle, field, ref size))
+			{
+				StringBuilder result = new StringBuilder(size.ToInt32());
+				if (Glooper.twoflower_brochure_get_userdata_string(mBrochure, resource.Handle, field, result, size))
+				{
+					return result.ToString();
+				}
+			}
+
+			return null;
+		}
+
+		public void SetUserdata(Resource resource, string field, string value)
+		{
+			Glooper.twoflower_brochure_set_userdata_string(mBrochure, resource.Handle, field, value);
+		}
+
+		public byte[] GetUserdataBytes(Resource resource, string field)
+		{
+			IntPtr size = IntPtr.Zero;
+			if (Glooper.twoflower_brochure_get_userdata_blob_length(mBrochure, resource.Handle, field, ref size))
+			{
+				byte[] result = new byte[size.ToInt64()];
+				if (Glooper.twoflower_brochure_get_userdata_blob(mBrochure, resource.Handle, field, result, size))
+				{
+					return result;
+				}
+			}
+
+			return null;
+		}
+
+		public void UnsetUserdata(Resource resource, string field)
+		{
+			Glooper.twoflower_brochure_unset_userdata(mBrochure, resource.Handle, field);
+		}
+
+		public bool HasUserdata(Resource resource, string field)
+		{
+			return Glooper.twoflower_brochure_has_userdata(mBrochure, resource.Handle, field);
+		}
+
 		public void Remove(Resource resource)
 		{
 			Glooper.twoflower_brochure_remove_resource(mBrochure, resource.Handle);

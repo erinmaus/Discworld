@@ -7,6 +7,7 @@
 // Copyright [bk]door.maus
 
 using System;
+using System.Text;
 using System.Runtime.InteropServices;
 
 using size_t = System.IntPtr;
@@ -126,17 +127,17 @@ namespace Dormouse.Rincewind
 		[DllImport(GlooperSharedLib, CallingConvention = CallingConvention.Cdecl)]
 		public static extern bool twoflower_brochure_has_action_definition(IntPtr brochure, int id);
 		[DllImport(GlooperSharedLib, CallingConvention = CallingConvention.Cdecl)]
-		public static extern bool twoflower_brochure_get_userdata_int(IntPtr brochure, IntPtr resource, string field, IntPtr value);
+		public static extern bool twoflower_brochure_get_userdata_int(IntPtr brochure, IntPtr resource, string field, ref int value);
 		[DllImport(GlooperSharedLib, CallingConvention = CallingConvention.Cdecl)]
-		public static extern bool twoflower_brochure_get_userdata_float(IntPtr brochure, IntPtr resource, string field, IntPtr value);
+		public static extern bool twoflower_brochure_get_userdata_float(IntPtr brochure, IntPtr resource, string field, ref float value);
 		[DllImport(GlooperSharedLib, CallingConvention = CallingConvention.Cdecl)]
-		public static extern bool twoflower_brochure_get_userdata_string_length(IntPtr brochure, IntPtr resource, string field, IntPtr value);
+		public static extern bool twoflower_brochure_get_userdata_string_length(IntPtr brochure, IntPtr resource, string field, ref IntPtr value);
 		[DllImport(GlooperSharedLib, CallingConvention = CallingConvention.Cdecl)]
-		public static extern bool twoflower_brochure_get_userdata_string(IntPtr brochure, IntPtr resource, string field, IntPtr value, size_t value_length);
+		public static extern bool twoflower_brochure_get_userdata_string(IntPtr brochure, IntPtr resource, string field, StringBuilder value, size_t value_length);
 		[DllImport(GlooperSharedLib, CallingConvention = CallingConvention.Cdecl)]
-		public static extern bool twoflower_brochure_get_userdata_blob_length(IntPtr brochure, IntPtr resource, string field, IntPtr value);
+		public static extern bool twoflower_brochure_get_userdata_blob_length(IntPtr brochure, IntPtr resource, string field, ref IntPtr value);
 		[DllImport(GlooperSharedLib, CallingConvention = CallingConvention.Cdecl)]
-		public static extern bool twoflower_brochure_get_userdata_blob(IntPtr brochure, IntPtr resource, string field, IntPtr value, size_t value_length);
+		public static extern bool twoflower_brochure_get_userdata_blob(IntPtr brochure, IntPtr resource, string field, byte[] value, size_t value_length);
 		[DllImport(GlooperSharedLib, CallingConvention = CallingConvention.Cdecl)]
 		public static extern bool twoflower_brochure_has_userdata(IntPtr brochure, IntPtr resource, string field);
 		[DllImport(GlooperSharedLib, CallingConvention = CallingConvention.Cdecl)]
@@ -146,7 +147,7 @@ namespace Dormouse.Rincewind
 		[DllImport(GlooperSharedLib, CallingConvention = CallingConvention.Cdecl)]
 		public static extern void twoflower_brochure_set_userdata_string(IntPtr brochure, IntPtr resource, string field, string value);
 		[DllImport(GlooperSharedLib, CallingConvention = CallingConvention.Cdecl)]
-		public static extern void twoflower_brochure_set_userdata_blob(IntPtr brochure, IntPtr resource, string field, IntPtr value, size_t value_length);
+		public static extern void twoflower_brochure_set_userdata_blob(IntPtr brochure, IntPtr resource, string field, byte[] value, size_t value_length);
 		[DllImport(GlooperSharedLib, CallingConvention = CallingConvention.Cdecl)]
 		public static extern void twoflower_brochure_unset_userdata(IntPtr brochure, IntPtr resource, string field);
 		[DllImport(GlooperSharedLib, CallingConvention = CallingConvention.Cdecl)]
