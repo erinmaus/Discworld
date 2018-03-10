@@ -26,11 +26,38 @@ namespace Dormouse.Rincewind.Mapp
 		public QuestStepResource FinalStep
 		{
 			get { return mFinalStep; }
+			set { SetFinalStep(value); }
+		}
+
+		Dictionary<SkillResource, int> requiredLevels = new Dictionary<SkillResource, int>();
+		public IReadOnlyDictionary<SkillResource, int> RequiredLevels
+		{
+			get { return requiredLevels; }
+			set { SetRequiredLevels(value); }
+		}
+
+		Dictionary<SkillResource, float> xpReward = new Dictionary<SkillResource, float>();
+		public IReadOnlyDictionary<SkillResource, float> RewardXP
+		{
+			get { return xpReward; }
+			set { SetXPReward(value); }
 		}
 
 		public QuestResource(Game game) : base(game)
 		{
 			// Nothing.
+		}
+
+		void CreateCompleteAction()
+		{
+			mCompleteAction = new ResourceAction() { IsGetter = true };
+			Game.SetActionDefinition(mCompleteAction, Game.QUEST_COMPLETE_ACTION);
+
+			mCompleteAction = Game.Brochure.Connect(mCompleteAction, Resource);
+
+			// This quest should be an output. This ensures the goal planner functions as expected.
+			Requirement outputRequirement = new Requirement() { IsOutput = true, Count = 1 };
+			Game.Brochure.Connect(outputRequirement, mCompleteAction, Resource);
 		}
 
 		public void SetFinalStep(QuestStepResource resource)
@@ -55,18 +82,78 @@ namespace Dormouse.Rincewind.Mapp
 			// Create action, if necessary.
 			if (mCompleteAction == null)
 			{
-				mCompleteAction = new ResourceAction() { IsGetter = true };
-				Game.SetActionDefinition(mCompleteAction, Game.QUEST_COMPLETE_ACTION);
-
-				mCompleteAction = Game.Brochure.Connect(mCompleteAction, Resource);
-
-				// This quest should be an output. This ensures the goal planner functions as expected.
-				Requirement outputRequirement = new Requirement() { IsOutput = true, Count = 1 };
-				Game.Brochure.Connect(outputRequirement, mCompleteAction, Resource);
+				CreateCompleteAction();
 			}
 
 			Requirement finalSepRequirement = new Requirement() { Count = 1 };
 			Game.Brochure.Connect(finalSepRequirement, mCompleteAction, resource.Resource);
+		}
+
+		public void SetRequiredLevels(IReadOnlyDictionary<SkillResource, int> levels)
+		{
+			if (mCompleteAction == null)
+			{
+				CreateCompleteAction();
+			}
+
+			// Clear old requirements.
+			var requirements = new RequirementCollection(Game.Brochure, mCompleteAction);
+			foreach (var requirement in requirements.All())
+			{
+				if (Game.IsResourceType(requirement.Resource, Game.SKILL_RESOURCE) &&
+				    !requirement.IsOutput)
+				{
+					Game.Brochure.Remove(requirement);
+				}
+			}
+
+			// Add new requirements.
+			foreach (var i in levels)
+			{
+				var skill = i.Key;
+				var level = i.Value;
+
+				if (skill.IsValid)
+				{
+					float xp = SkillResource.GetXPForLevel(level);
+					var requirement = new Requirement() { Count = xp };
+
+					Game.Brochure.Connect(requirement, mCompleteAction, skill.Resource);
+				}
+			}
+		}
+
+		public void SetXPReward(IReadOnlyDictionary<SkillResource, float> skills)
+		{
+			if (mCompleteAction == null)
+			{
+				CreateCompleteAction();
+			}
+
+			// Clear old XP rewards.
+			var requirements = new RequirementCollection(Game.Brochure, mCompleteAction);
+			foreach (var requirement in requirements.All())
+			{
+				if (Game.IsResourceType(requirement.Resource, Game.SKILL_RESOURCE) &&
+					requirement.IsOutput)
+				{
+					Game.Brochure.Remove(requirement);
+				}
+			}
+
+			// Add new XP rewards.
+			foreach (var i in skills)
+			{
+				var skill = i.Key;
+				var xp = i.Value;
+
+				if (skill.IsValid)
+				{
+					var requirement = new Requirement() { Count = xp, IsOutput = true };
+
+					Game.Brochure.Connect(requirement, mCompleteAction, skill.Resource);
+				}
+			}
 		}
 
 		protected override void BeforeUpdate()
@@ -74,13 +161,8 @@ namespace Dormouse.Rincewind.Mapp
 			Game.SetResourceType(Resource, Game.QUEST_RESOURCE);
 		}
 
-		protected override bool TryFromResource(Resource resource)
+		void GetFinalStep(Resource resource)
 		{
-			if (!Game.IsResourceType(resource, Game.QUEST_RESOURCE))
-			{
-				return false;
-			}
-
 			QuestStepResource finalStep = null;
 			var actions = new ResourceActionCollection(Game.Brochure, resource);
 			foreach (var action in actions.ByName(Game.QUEST_COMPLETE_ACTION).Where(a => a.IsGetter))
@@ -106,7 +188,7 @@ namespace Dormouse.Rincewind.Mapp
 						{
 							throw new InvalidOperationException(String.Format("Final step cannot be input or output; bad requirement #{0}.", requirement.ID));
 						}
-		
+
 						finalStepResource = requirement.Resource;
 					}
 					else if (Game.IsResourceType(requirement.Resource, Game.QUEST_RESOURCE) && requirement.IsOutput)
@@ -127,6 +209,8 @@ namespace Dormouse.Rincewind.Mapp
 
 				finalStep = new QuestStepResource(Game);
 				finalStep.FromResource(finalStepResource);
+
+				mCompleteAction = action;
 			}
 
 			if (finalStep == null)
@@ -137,6 +221,75 @@ namespace Dormouse.Rincewind.Mapp
 			{
 				mFinalStep = finalStep;
 			}
+		}
+
+		void GetSkillRequirements()
+		{
+			Dictionary<int, SkillResource> skills = new Dictionary<int, SkillResource>();
+			requiredLevels = new Dictionary<SkillResource, int>();
+
+			var requirements = new RequirementCollection(Game.Brochure, mCompleteAction);
+			foreach (var requirement in requirements.All())
+			{
+				if (Game.IsResourceType(requirement.Resource, Game.SKILL_RESOURCE) &&
+					!requirement.IsOutput)
+				{
+					int level = SkillResource.GetLevelForXP(requirement.Count);
+					SkillResource resource;
+					if (skills.TryGetValue(requirement.Resource.ID, out resource))
+					{
+						requiredLevels[resource] = Math.Max(requiredLevels[resource], level);
+					}
+					else
+					{
+						resource = new SkillResource(Game);
+						resource.FromResource(requirement.Resource);
+
+						skills.Add(requirement.Resource.ID, resource);
+						requiredLevels.Add(resource, level);
+					}
+				}
+			}
+		}
+
+		void GetSkillXPRewards()
+		{
+			Dictionary<int, SkillResource> skills = new Dictionary<int, SkillResource>();
+			xpReward = new Dictionary<SkillResource, float>();
+
+			var requirements = new RequirementCollection(Game.Brochure, mCompleteAction);
+			foreach (var requirement in requirements.All())
+			{
+				if (Game.IsResourceType(requirement.Resource, Game.SKILL_RESOURCE) &&
+					requirement.IsOutput)
+				{
+					SkillResource resource;
+					if (skills.TryGetValue(requirement.Resource.ID, out resource))
+					{
+						xpReward[resource] += requirement.Count;
+					}
+					else
+					{
+						resource = new SkillResource(Game);
+						resource.FromResource(requirement.Resource);
+
+						skills.Add(requirement.Resource.ID, resource);
+						xpReward.Add(resource, requirement.Count);
+					}
+				}
+			}
+		}
+
+		protected override bool TryFromResource(Resource resource)
+		{
+			if (!Game.IsResourceType(resource, Game.QUEST_RESOURCE))
+			{
+				return false;
+			}
+
+			GetFinalStep(resource);
+			GetSkillRequirements();
+			GetSkillXPRewards();
 
 			return true;
 		}

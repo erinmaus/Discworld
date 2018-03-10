@@ -168,7 +168,7 @@ namespace Dormouse.Rincewind.Mapp
 
 		protected override void BeforeUpdate()
 		{
-			// Nothing.
+			Game.SetResourceType(Resource, Game.SKILL_RESOURCE);
 		}
 
 		protected override bool TryFromResource(Resource resource)
