@@ -169,7 +169,7 @@ namespace Dormouse.Rincewind
 		[DllImport(GlooperSharedLib, CallingConvention = CallingConvention.Cdecl)]
 		public static extern size_t twoflower_brochure_get_num_tags(IntPtr brochure, IntPtr resource);
 		[DllImport(GlooperSharedLib, CallingConvention = CallingConvention.Cdecl)]
-		public static extern size_t twoflower_brochure_get_tags(IntPtr brochure, IntPtr resource, IntPtr value, size_t value_length);
+		public static extern size_t twoflower_brochure_get_tags(IntPtr brochure, IntPtr resource, IntPtr[] value, size_t value_length);
 		[DllImport(GlooperSharedLib, CallingConvention = CallingConvention.Cdecl)]
 		public static extern void twoflower_brochure_add_tag(IntPtr brochure, IntPtr resource, string tag);
 		[DllImport(GlooperSharedLib, CallingConvention = CallingConvention.Cdecl)]

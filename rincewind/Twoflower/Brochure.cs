@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Runtime.InteropServices;
 
 namespace Dormouse.Rincewind.Twoflower
 {
@@ -94,6 +95,37 @@ namespace Dormouse.Rincewind.Twoflower
 		public void SetUserdata(Resource resource, string field, string value)
 		{
 			Glooper.twoflower_brochure_set_userdata_string(mBrochure, resource.Handle, field, value);
+		}
+
+		public bool HasTag(Resource resource, string tag)
+		{
+			return Glooper.twoflower_brochure_has_tag(mBrochure, resource.Handle, tag);
+		}
+
+		public void AddTag(Resource resource, string tag)
+		{
+			Glooper.twoflower_brochure_add_tag(mBrochure, resource.Handle, tag);
+		}
+
+		public void RemoveTag(Resource resource, string tag)
+		{
+			Glooper.twoflower_brochure_remove_tag(mBrochure, resource.Handle, tag);
+		}
+
+		public string[] GetTags(Resource resource)
+		{
+			var count = Glooper.twoflower_brochure_get_num_tags(mBrochure, resource.Handle);
+
+			IntPtr[] tags = new IntPtr[count.ToInt32()];
+			Glooper.twoflower_brochure_get_tags(mBrochure, resource.Handle, tags, count);
+
+			string[] result = new string[count.ToInt32()];
+			for (int i = 0; i < tags.Length; ++i)
+			{
+				result[i] = Marshal.PtrToStringAnsi(tags[i]);
+			}
+
+			return result;
 		}
 
 		public byte[] GetUserdataBytes(Resource resource, string field)
