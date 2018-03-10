@@ -46,7 +46,7 @@ namespace Dormouse.Rincewind.Mapp
 				throw new InvalidOperationException(String.Format("Resource type {0} not found; cannot compare to resource #{1} ('{2}').", name, resource.ID, resource.Name));
 			}
 
-			return resource.ID == id;
+			return resource.TypeID == id;
 		}
 
 		Dictionary<string, int> mActionDefinitionIDs = new Dictionary<string, int>();
@@ -89,7 +89,7 @@ namespace Dormouse.Rincewind.Mapp
 			EnsureResourceType("quest");
 			EnsureResourceType("quest_step");
 
-			EnsureActionType("quest.complete");
+			EnsureActionType("quest.complete", true);
 		}
 
 		void EnsureResourceType(string name)
@@ -110,13 +110,13 @@ namespace Dormouse.Rincewind.Mapp
 			}
 		}
 
-		void EnsureActionType(string name)
+		void EnsureActionType(string name, bool isGetter = false)
 		{
 			var actions = new ResourceActionCollection(mBrochure);
 			var types = actions.Definitions().Where(r => r.TypeName == name).ToArray();
 			if (types.Length == 0)
 			{
-				int id = mBrochure.AddActionDefinition(new ResourceAction() { TypeName = name });
+				int id = mBrochure.AddActionDefinition(new ResourceAction() { TypeName = name, IsGetter = isGetter });
 				mActionDefinitionIDs.Add(name, id);
 			}
 			else if (types.Length == 1)
