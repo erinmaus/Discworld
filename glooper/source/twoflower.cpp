@@ -816,7 +816,7 @@ GLOOPER_API twoflower_actions_iterator* twoflower_actions_by_name(const twoflowe
 	}
 	else
 	{
-		auto result = new twoflower::Brochure::Actions::const_iterator(a->by_name(type));
+		auto result = new twoflower::Brochure::Actions::const_iterator(a->by_name(name));
 		return (twoflower_actions_iterator*)result;
 	}
 }
