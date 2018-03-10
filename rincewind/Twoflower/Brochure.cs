@@ -43,8 +43,8 @@ namespace Dormouse.Rincewind.Twoflower
 		{
 			unsafe
 			{
-				int value;
-				if (Glooper.twoflower_brochure_get_userdata_int(mBrochure, resource.Handle, field, &value))
+				int value = 0;
+				if (Glooper.twoflower_brochure_get_userdata_int(mBrochure, resource.Handle, field, ref value))
 				{
 					return value;
 				}
@@ -55,15 +55,15 @@ namespace Dormouse.Rincewind.Twoflower
 
 		public void SetUserdata(Resource resource, string field, int value)
 		{
-			Glooper.twoflower_brochure_set_userdata_int(resource.Handle, resource.Handle, field, value);
+			Glooper.twoflower_brochure_set_userdata_int(mBrochure, resource.Handle, field, value);
 		}
 
 		public float? GetUserdataSingle(Resource resource, string field)
 		{
 			unsafe
 			{
-				float value;
-				if (Glooper.twoflower_brochure_get_userdata_float(mBrochure, resource.Handle, field, &value))
+				float value = 0.0f;
+				if (Glooper.twoflower_brochure_get_userdata_float(mBrochure, resource.Handle, field, ref value))
 				{
 					return value;
 				}
