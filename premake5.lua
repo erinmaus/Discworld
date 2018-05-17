@@ -175,6 +175,7 @@ solution "Discworld"
 		configuration {}
 			links { "System" }
 			links { "System.Windows.Forms" }
+			clr "Unsafe"
 
 		namespace "Dormouse.Rincewind"
 
