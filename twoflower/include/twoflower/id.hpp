@@ -20,7 +20,7 @@ namespace twoflower
 		ID(int value);
 		~ID() = default;
 
-		operator int();
+		operator int() const;
 
 		bool operator <(const ID& other);
 		bool operator >(const ID& other);

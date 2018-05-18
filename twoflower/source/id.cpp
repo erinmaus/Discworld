@@ -30,7 +30,7 @@ twoflower::ID::ID(ID&& other)
 	*this = other;
 }
 
-twoflower::ID::operator int()
+twoflower::ID::operator int() const
 {
 	return id;
 }
