@@ -59,7 +59,7 @@ namespace twoflower
 		static const std::size_t COLUMN_NAME = 0;
 		static const std::size_t COLUMN_TYPE = 1;
 		static const std::size_t COLUMN_NULLABLE = 2;
-		static const std::size_t COLUMN_UNIQUE = 2;
+		static const std::size_t COLUMN_UNIQUE = 3;
 		typedef std::tuple<std::string, Type, bool, bool> Column;
 		typedef std::set<Column> Columns;
 		Columns columns;
