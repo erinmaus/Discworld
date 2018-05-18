@@ -23,6 +23,8 @@ twoflower::ID::ID(int value)
 	{
 		throw std::runtime_error("id must be non-negative");
 	}
+
+	id = value;
 }
 
 twoflower::ID::ID(ID&& other)
