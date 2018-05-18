@@ -36,9 +36,14 @@ void twoflower::Brochure::Table::add_primary_key(
 void twoflower::Brochure::Table::add_column(
 	const std::string& name,
 	Type type,
-	bool nullable)
+	bool nullable,
+	bool unique)
 {
 	columns.emplace(name, type, nullable);
+	if (unique)
+	{
+		unique_columns.emplace(unique);
+	}
 }
 
 void twoflower::Brochure::Table::bind_foreign_key(
@@ -48,11 +53,6 @@ void twoflower::Brochure::Table::bind_foreign_key(
 {
 	auto& foreign_key = foreign_keys[other_table];
 	foreign_key[self_column] = reference_column;
-}
-
-bool twoflower::Brochure::Table::exists(Brochure::Database& database) const
-{
-	return table_exists(database) && match_columns(database) && match_foreign_keys(database);
 }
 
 void twoflower::Brochure::Table::create(Brochure::Database& database) const
@@ -73,11 +73,17 @@ void twoflower::Brochure::Table::create(Brochure::Database& database) const
 		auto name = std::get<COLUMN_NAME>(column);
 		auto type = std::get<COLUMN_TYPE>(column);
 		auto nullable = std::get<COLUMN_NULLABLE>(column);
+		auto unique = std::get<COLUMN_UNIQUE>(column);
 		stream << "\t" << name << " " << get_type_literal(type);
 
 		if (!nullable)
 		{
 			stream << " " << "NOT NULL";
+		}
+
+		if (unique)
+		{
+			stream << " " << "UNIQUE";
 		}
 
 		if (type == Type::text)
@@ -102,6 +108,11 @@ void twoflower::Brochure::Table::create(Brochure::Database& database) const
 		++index;
 	}
 	stream << ")";
+
+	if (!unique_columns.empty())
+	{
+		stream << 
+	}
 
 	if (!foreign_keys.empty())
 	{
@@ -157,123 +168,6 @@ void twoflower::Brochure::Table::create(Brochure::Database& database) const
 
 	auto statement = database.create_statement(stream.str());
 	statement.execute();
-}
-
-bool twoflower::Brochure::Table::table_exists(Brochure::Database& database) const
-{
-	auto statement = database.create_statement(
-		"SELECT name FROM sqlite_master\n"
-		"WHERE type='table' AND name=?");
-	statement.bind(1, name);
-
-	return statement.execute() == 1;
-}
-
-bool twoflower::Brochure::Table::match_foreign_keys(Brochure::Database& database) const
-{
-	std::stringstream query;
-	query << "PRAGMA table_info(" << name << ");";
-	auto statement = database.create_statement(query.str());
-
-	Columns visited_primary_keys, visited_columns;
-	while (statement.next())
-	{
-		std::string column_name;
-		statement.get("name", column_name);
-
-		std::string column_type_literal;
-		statement.get("type", column_type_literal);
-		Type column_type;
-		if (column_type_literal == "INTEGER")
-		{
-			column_type = Type::integer;
-		}
-		else if (column_type_literal == "TEXT")
-		{
-			column_type = Type::text;
-		}
-		else if (column_type_literal == "REAL")
-		{
-			column_type = Type::real;
-		}
-		else if (column_type_literal == "BLOB")
-		{
-			column_type = Type::blob;
-		}
-		else
-		{
-			return false;
-		}
-
-		int column_not_null;
-		statement.get("notnull", column_not_null);
-		bool column_nullable = !column_not_null;
-
-		int column_primary_key;
-		statement.get("pk", column_primary_key);
-
-		auto key = std::make_tuple(column_name, column_type, column_nullable);
-		if (column_primary_key)
-		{
-			if (primary_keys.count(key) == 0)
-			{
-				return false;
-			}
-
-			visited_primary_keys.insert(key);
-		}
-		else
-		{
-			if (columns.count(key) == 0)
-			{
-				return false;
-			}
-
-			visited_columns.insert(key);
-		}
-	}
-
-	for (auto& column: columns)
-	{
-		if (!visited_columns.count(column))
-		{
-			return false;
-		}
-	}
-
-	for (auto& primary_key: primary_keys)
-	{
-		if (!visited_primary_keys.count(primary_key))
-		{
-			return false;
-		}
-	}
-
-	return true;
-}
-
-bool twoflower::Brochure::Table::match_columns(Brochure::Database& database) const
-{
-	std::stringstream query;
-	query << "PRAGMA foreign_key_list(" << name << ");";
-	auto statement = database.create_statement(query.str());
-
-	ForeignKeys visited_foreign_keys;
-	while (statement.next())
-	{
-		std::string foreign_table;
-		statement.get("table", foreign_table);
-
-		std::string self_column;
-		statement.get("from", self_column);
-
-		std::string foreign_column;
-		statement.get("to", foreign_column);
-
-		visited_foreign_keys[foreign_table].emplace(self_column, foreign_column);
-	}
-
-	return visited_foreign_keys == foreign_keys;
 }
 
 std::string twoflower::Brochure::Table::get_type_literal(Type type)

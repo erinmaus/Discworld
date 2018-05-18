@@ -33,21 +33,20 @@ namespace twoflower
 			blob
 		};
 		void add_primary_key(const std::string& name, Type type);
-		void add_column(const std::string& name, Type type, bool nullable);
+		void add_column(
+			const std::string& name,
+			Type type,
+			bool nullable,
+			bool unique);
 
 		void bind_foreign_key(
 			const std::string& other_table,
 			const std::string& self_column,
 			const std::string& reference_column);
 
-		bool exists(Brochure::Database& database) const;
 		void create(Brochure::Database& database) const;
 
 	private:
-		bool table_exists(Brochure::Database& database) const;
-		bool match_columns(Brochure::Database& database) const;
-		bool match_foreign_keys(Brochure::Database& database) const;
-
 		static std::string get_type_literal(Type type);
 
 		std::string name;
@@ -59,6 +58,7 @@ namespace twoflower
 		static const std::size_t COLUMN_NAME = 0;
 		static const std::size_t COLUMN_TYPE = 1;
 		static const std::size_t COLUMN_NULLABLE = 2;
+		static const std::size_t COLUMN_UNIQUE = 2;
 		typedef std::tuple<std::string, Type, bool> Column;
 		typedef std::set<Column> Columns;
 		Columns columns;
