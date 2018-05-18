@@ -21,6 +21,7 @@ namespace twoflower
 	{
 	public:
 		explicit Table(const std::string& name);
+		Table(const std::string& name, const Table& table);
 		~Table() = default;
 
 		const std::string& get_name() const;

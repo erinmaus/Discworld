@@ -21,6 +21,12 @@ twoflower::Brochure::Table::Table(const std::string& name) :
 	// Nothing.
 }
 
+twoflower::Brochure::Table::Table(const std::string& name, const Table& table)
+{
+	*this = table;
+	this->name = name;
+}
+
 const std::string& twoflower::Brochure::Table::get_name() const
 {
 	return name;
