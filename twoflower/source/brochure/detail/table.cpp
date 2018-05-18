@@ -30,7 +30,7 @@ void twoflower::Brochure::Table::add_primary_key(
 	const std::string& name,
 	Type type)
 {
-	primary_keys.emplace(name, type, false);
+	primary_keys.emplace(name, type, false, false);
 }
 
 void twoflower::Brochure::Table::add_column(
@@ -39,11 +39,7 @@ void twoflower::Brochure::Table::add_column(
 	bool nullable,
 	bool unique)
 {
-	columns.emplace(name, type, nullable);
-	if (unique)
-	{
-		unique_columns.emplace(unique);
-	}
+	columns.emplace(name, type, nullable, unique);
 }
 
 void twoflower::Brochure::Table::bind_foreign_key(
@@ -108,11 +104,6 @@ void twoflower::Brochure::Table::create(Brochure::Database& database) const
 		++index;
 	}
 	stream << ")";
-
-	if (!unique_columns.empty())
-	{
-		stream << 
-	}
 
 	if (!foreign_keys.empty())
 	{
