@@ -32,16 +32,12 @@ namespace twoflower
 		const std::string& get_name() const;
 		void set_name(const std::string& value);
 
-		const ResourceType& get_resource_type() const;
-		void set_resource_type(const ResourceType& value);
-
 		bool get_is_singleton() const;
 		void set_is_singleton(bool value);
 
 	private:
 		ID id;
 		std::string name;
-		ResourceType resource_type;
 		bool is_singleton;
 	};
 }

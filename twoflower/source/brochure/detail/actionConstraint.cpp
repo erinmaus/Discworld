@@ -43,26 +43,6 @@ void twoflower::ActionConstraint::set_type(Type value)
 	type = value;
 }
 
-const twoflower::Action& twoflower::ActionConstraint::get_action() const
-{
-	return action;
-}
-
-void twoflower::ActionConstraint::set_action(const Action& value)
-{
-	action = value;
-}
-
-const twoflower::Resource& twoflower::ActionConstraint::get_resource() const
-{
-	return resource;
-}
-
-void twoflower::ActionConstraint::set_resource(const Resource& value)
-{
-	resource = value;
-}
-
 float twoflower::ActionConstraint::get_count() const
 {
 	return count;

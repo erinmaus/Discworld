@@ -25,12 +25,8 @@ namespace twoflower
 		const ID& get_id() const;
 		void set_id(const ID& value);
 
-		const ActionDefinition& get_action_definition() const;
-		void set_action_definition(const ActionDefinition& value);
-
 	private:
 		ID id;
-		ActionDefinition action_definition;
 	};
 }
 

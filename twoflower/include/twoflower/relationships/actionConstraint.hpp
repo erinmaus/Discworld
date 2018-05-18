@@ -40,20 +40,12 @@ namespace twoflower
 		Type get_type() const;
 		void set_type(Type type);
 
-		const Action& get_action() const;
-		void set_action(const Action& value);
-
-		const Resource& get_resource() const;
-		void set_resource(const Resource& value);
-
 		float get_count() const;
 		void set_count(float value);
 
 	private:
 		ID id;
 		Type type;
-		Action action;
-		Resource resource;
 		float count;
 	};
 }

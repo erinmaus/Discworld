@@ -41,17 +41,6 @@ void twoflower::Resource::set_name(const std::string& value)
 	name = value;
 }
 
-const twoflower::ResourceType&
-twoflower::Resource::get_resource_type() const
-{
-	return resource_type;
-}
-
-void twoflower::Resource::set_resource_type(const ResourceType& value)
-{
-	resource_type = value;
-}
-
 bool twoflower::Resource::get_is_singleton() const
 {
 	return is_singleton;

@@ -25,14 +25,3 @@ void twoflower::Action::set_id(const ID& value)
 {
 	id = value;
 }
-
-const twoflower::ActionDefinition&
-twoflower::Action::get_action_definition() const
-{
-	return action_definition;
-}
-
-void twoflower::Action::set_action_definition(const ActionDefinition& value)
-{
-	action_definition = value;
-}
