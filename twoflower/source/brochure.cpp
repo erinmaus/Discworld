@@ -23,6 +23,68 @@ twoflower::Brochure::~Brochure()
 	// Nothing.
 }
 
+twoflower::ActionDefinition twoflower::Brochure::create_action_definition(
+	const std::string& name)
+{
+	ActionDefinition result;
+
+	auto statement = database->create_statement(
+		"INSERT INTO ActionDefinition(name)"
+		" VALUES (?);");
+	statement.bind(1, name);
+	statement.execute();
+
+	auto id_statement = database->create_statement(
+		"SELECT last_insert_rowid();");
+	id_statement.next();
+
+	int id;
+	id_statement.get(0, id);
+
+	result.set_id(id);
+	result.set_name(name);
+
+	return result;
+}
+
+bool twoflower::Brochure::try_get_action_definition(
+	const ID& id,
+	ActionDefinition& result) const
+{
+	auto statement = database->create_statement(
+		"SELECT name FROM ActionDefinition WHERE id = ?;");
+	statement.bind(1, (int)id);
+
+	if (statement.next())
+	{
+		result.set_id((int)id);
+
+		std::string name;
+		statement.get("name", name);
+		result.set_name(name);
+
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+twoflower::Brochure::ActionDefinitionIterator
+twoflower::Brochure::action_definitions_begin() const
+{
+	auto statement = database->create_statement(
+		"SELECT * FROM ActionDefinition;");
+	return ActionDefinitionIterator(*this, statement);
+}
+
+twoflower::Brochure::ActionDefinitionIterator
+twoflower::Brochure::action_definitions_end() const
+{
+	return ActionDefinitionIterator();
+}
+
 void twoflower::Brochure::create()
 {
 	Table action_definition("ActionDefinition");
