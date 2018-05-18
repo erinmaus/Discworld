@@ -39,7 +39,8 @@ solution "Discworld"
 		files {
 			"twoflower/source/**.cpp",
 			"twoflower/source/**.c",
-			"twoflower/include/**.hpp"
+			"twoflower/include/**.hpp",
+			"twoflower/source/**.hpp",
 		}
 
 		includedirs {
