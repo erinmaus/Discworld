@@ -51,3 +51,36 @@ solution "Discworld"
 		libdirs {
 			path.join(_OPTIONS["deps"] or _DEFAULTS["deps"], "lib")
 		}
+
+	project "Twoflower.Test"
+		language "C++"
+		kind "ConsoleApp"
+
+		configuration "Debug"
+			targetsuffix "_debug"
+			objdir "obj/twoflower_test/debug"
+			targetdir "bin"
+		configuration "Release"
+			objdir "obj/twoflower_test/release"
+			targetdir "bin"
+		configuration {}
+			runtime "release"
+
+		location "twoflower/test"
+
+		files {
+			"twoflower/test/include/**.hpp",
+			"twoflower/test/source/**.cpp"
+		}
+
+		includedirs {
+			path.join(_OPTIONS["deps"] or _DEFAULTS["deps"], "include"),
+			"twoflower/include",
+			"twoflower/test/include"
+		}
+
+		libdirs {
+			path.join(_OPTIONS["deps"] or _DEFAULTS["deps"], "lib")
+		}
+
+		links { "Twoflower" }
