@@ -19,6 +19,8 @@ namespace twoflower
 		explicit Brochure(const std::string& filename = "");
 		~Brochure();
 
+		void create();
+
 	private:
 		class Database;
 		class Statement;
