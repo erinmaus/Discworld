@@ -6,16 +6,14 @@
 //
 // Copyright [bk]door.maus
 
-#include "twoflower/relationships/Resource.hpp"
+#include "twoflower/relationships/resource.hpp"
 
 twoflower::Resource::Resource(
 	const ID& id,
 	const std::string& name,
-	const ResourceType& resource_type,
 	bool is_singleton) :
 		id(id),
 		name(name),
-		resource_type(resource_type),
 		is_singleton(is_singleton)
 {
 	// Nothing.

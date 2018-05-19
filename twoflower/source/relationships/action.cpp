@@ -11,7 +11,7 @@
 twoflower::Action::Action(
 	const ID& id,
 	const ActionDefinition& action_definition) :
-		id(id), action_definition(action_definition)
+		id(id)
 {
 	// Nothing.
 }

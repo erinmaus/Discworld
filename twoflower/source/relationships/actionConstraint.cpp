@@ -11,13 +11,9 @@
 twoflower::ActionConstraint::ActionConstraint(
 	const ID& id,
 	Type type,
-	const Action& action,
-	const Resource& resource,
 	float count) :
 		id(id),
 		type(type),
-		action(action),
-		resource(resource),
 		count(count)
 {
 	// Nothing.

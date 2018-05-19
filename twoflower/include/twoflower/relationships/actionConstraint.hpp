@@ -29,8 +29,6 @@ namespace twoflower
 		ActionConstraint(
 			const ID& id,
 			Type type,
-			const Action& action,
-			const Resource& resource,
 			float count);
 		~ActionConstraint() = default;
 

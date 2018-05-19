@@ -22,7 +22,6 @@ namespace twoflower
 		Resource(
 			const ID& id,
 			const std::string& name,
-			const ResourceType& resource_type,
 			bool singleton);
 		~Resource() = default;
 
