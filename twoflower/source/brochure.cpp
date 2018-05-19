@@ -85,6 +85,93 @@ twoflower::Brochure::action_definitions_end() const
 	return Iterator<ActionDefinition>();
 }
 
+twoflower::Action twoflower::Brochure::create_action(
+	const ActionDefinition& action_definition)
+{
+	twoflower::Action result;
+	auto statement = database->create_statement(
+		"INSERT INTO Action(action_definition_id)"
+		" VALUES (?);");
+	statement.bind(1, (int)action_definition.get_id());
+
+	statement.execute();
+
+	auto id_statement = database->create_statement(
+		"SELECT last_insert_rowid();");
+	id_statement.next();
+
+	int id;
+	id_statement.get(0, id);
+
+	result.set_id(id);
+
+	return result;
+}
+
+bool twoflower::Brochure::try_get_action(const ID& id, Action& result)
+{
+	auto statement = database->create_statement(
+		"SELECT 1 FROM Action WHERE id = ?;");
+	statement.bind(1, (int)id);
+
+	if (statement.next())
+	{
+		result.set_id(id);
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+twoflower::ActionDefinition twoflower::Brochure::get_action_definition(
+	const Action& action)
+{
+	ActionDefinition result;
+
+	auto statement = database->create_statement(
+		"SELECT action_definition_id FROM Action WHERE id = ?;");
+	statement.bind(1, (int)action.get_id());
+
+	if (statement.next())
+	{
+		int id;
+		statement.get("action_definition_id", id);
+
+		if (try_get_action_definition(id, result))
+		{
+			return result;
+		}
+	}
+
+	throw std::runtime_error("action does not exist in brochure");
+}
+
+twoflower::Brochure::Iterator<twoflower::Action>
+twoflower::Brochure::actions_begin() const
+{
+	auto statement = database->create_statement(
+		"SELECT id FROM Action;");
+	return Iterator<Action>(*this, statement);
+}
+
+twoflower::Brochure::Iterator<twoflower::Action>
+twoflower::Brochure::actions_end() const
+{
+	return Iterator<Action>();
+}
+
+twoflower::Brochure::Iterator<twoflower::Action>
+twoflower::Brochure::actions_by_definition(
+	const ActionDefinition& action_definition) const
+{
+	auto statement = database->create_statement(
+		"SELECT id FROM Action WHERE action_definition_id = ?;");
+	statement.bind(1, (int)action_definition.get_id());
+	return Iterator<Action>(*this, statement);
+}
+
 void twoflower::Brochure::create()
 {
 	Table action_definition("ActionDefinition");
@@ -172,6 +259,25 @@ bool twoflower::Brochure::IteratorImpl<twoflower::ActionDefinition>::next(
 
 		value.set_id(id);
 		value.set_name(name);
+
+		return true;
+	}
+}
+
+bool twoflower::Brochure::IteratorImpl<twoflower::Action>::next(
+	Statement& statement,
+	Action& value)
+{
+	if (!statement.next())
+	{
+		return false;
+	}
+	else
+	{
+		int id;
+		statement.get("id", id);
+
+		value.set_id(id);
 
 		return true;
 	}

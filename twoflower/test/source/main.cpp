@@ -15,14 +15,14 @@ int main(int argc, const char* argv[])
 	twoflower::Brochure brochure(":memory:");
 	brochure.create();
 
-	auto mineActionDefinition = brochure.create_action_definition("mine");
+	auto mine_action_definition = brochure.create_action_definition("mine");
 	std::printf(
 		"mine action definition: %d\n",
-		(int)mineActionDefinition.get_id());
-	auto smithActionDefinition = brochure.create_action_definition("smith");
+		(int)mine_action_definition.get_id());
+	auto smith_action_definition = brochure.create_action_definition("smith");
 	std::printf(
 		"smith action definition: %d\n",
-		(int)smithActionDefinition.get_id());
+		(int)smith_action_definition.get_id());
 
 	try
 	{
@@ -42,7 +42,7 @@ int main(int argc, const char* argv[])
 		std::printf("%s\n", e.what());
 	}
 
-	std::printf("actions:\n");
+	std::printf("action definitions:\n");
 	{
 		auto begin = brochure.action_definitions_begin();
 		auto end = brochure.action_definitions_end();
@@ -56,14 +56,32 @@ int main(int argc, const char* argv[])
 		}
 	}
 
-	twoflower::ActionDefinition actionDefinition1;
-	if (brochure.try_get_action_definition(1, actionDefinition1))
+	twoflower::ActionDefinition action_definition1;
+	if (brochure.try_get_action_definition(1, action_definition1))
 	{
-		std::printf("action 1: %s\n", actionDefinition1.get_name().c_str());
+		std::printf("action 1: %s\n", action_definition1.get_name().c_str());
 	}
 	else
 	{
 		std::printf("couldn't get action 1\n");
+	}
+
+	auto smith_action = brochure.create_action(smith_action_definition);
+	std::printf("smith action: %d\n", (int)smith_action.get_id());
+
+	std::printf("actions:\n");
+	{
+		auto begin = brochure.actions_begin();
+		auto end = brochure.actions_end();
+
+		for (auto i = begin; i != end; ++i)
+		{
+			auto action_definition = brochure.get_action_definition(*i);
+			std::printf(
+				"- '%s' (id: %d)",
+				action_definition.get_name().c_str(),
+				(int)i->get_id());
+		}
 	}
 
 	return 0;

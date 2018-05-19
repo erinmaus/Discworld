@@ -34,6 +34,15 @@ namespace twoflower
 		Iterator<ActionDefinition> action_definitions_begin() const;
 		Iterator<ActionDefinition> action_definitions_end() const;
 
+		Action create_action(const ActionDefinition& action_definition);
+		bool try_get_action(const ID& id, Action& result);
+		ActionDefinition get_action_definition(const Action& action);
+
+		Iterator<Action> actions_begin() const;
+		Iterator<Action> actions_end() const;
+		Iterator<Action> actions_by_definition(
+			const ActionDefinition& action_definition) const;
+
 		void create();
 
 	private:
@@ -51,6 +60,12 @@ namespace twoflower
 		struct IteratorImpl<ActionDefinition>
 		{
 			static bool next(Statement& statement, ActionDefinition& value);
+		};
+
+		template <>
+		struct IteratorImpl<Action>
+		{
+			static bool next(Statement& statement, Action& value);
 		};
 
 		std::shared_ptr<Database> database;
