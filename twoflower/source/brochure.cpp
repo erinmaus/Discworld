@@ -71,18 +71,18 @@ bool twoflower::Brochure::try_get_action_definition(
 	}
 }
 
-twoflower::Brochure::ActionDefinitionIterator
+twoflower::Brochure::Iterator<twoflower::ActionDefinition>
 twoflower::Brochure::action_definitions_begin() const
 {
 	auto statement = database->create_statement(
 		"SELECT * FROM ActionDefinition;");
-	return ActionDefinitionIterator(*this, statement);
+	return Iterator<ActionDefinition>(*this, statement);
 }
 
-twoflower::Brochure::ActionDefinitionIterator
+twoflower::Brochure::Iterator<twoflower::ActionDefinition>
 twoflower::Brochure::action_definitions_end() const
 {
-	return ActionDefinitionIterator();
+	return Iterator<ActionDefinition>();
 }
 
 void twoflower::Brochure::create()
@@ -152,4 +152,27 @@ void twoflower::Brochure::create()
 
 	Table action_requirement("ActionRequirement", action_constraint);
 	action_requirement.create(*database);
+}
+
+bool twoflower::Brochure::IteratorImpl<twoflower::ActionDefinition>::next(
+	Statement& statement,
+	ActionDefinition& value)
+{
+	if (!statement.next())
+	{
+		return false;
+	}
+	else
+	{
+		int id;
+		statement.get("id", id);
+
+		std::string name;
+		statement.get("name", name);
+
+		value.set_id(id);
+		value.set_name(name);
+
+		return true;
+	}
 }
