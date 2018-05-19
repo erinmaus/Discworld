@@ -172,6 +172,68 @@ twoflower::Brochure::actions_by_definition(
 	return Iterator<Action>(*this, statement);
 }
 
+twoflower::ResourceType twoflower::Brochure::create_resource_type(
+	const std::string& name)
+{
+	ResourceType result;
+
+	auto statement = database->create_statement(
+		"INSERT INTO ResourceType(name)"
+		" VALUES (?);");
+	statement.bind(1, name);
+	statement.execute();
+
+	auto id_statement = database->create_statement(
+		"SELECT last_insert_rowid();");
+	id_statement.next();
+
+	int id;
+	id_statement.get(0, id);
+
+	result.set_id(id);
+	result.set_name(name);
+
+	return result;
+}
+
+bool twoflower::Brochure::try_get_resource_type(
+	const ID& id,
+	ResourceType& result) const
+{
+	auto statement = database->create_statement(
+		"SELECT name FROM ResourceType WHERE id = ?;");
+	statement.bind(1, (int)id);
+
+	if (statement.next())
+	{
+		result.set_id((int)id);
+
+		std::string name;
+		statement.get("name", name);
+		result.set_name(name);
+
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+twoflower::Brochure::Iterator<twoflower::ResourceType>
+twoflower::Brochure::resource_types_begin() const
+{
+	auto statement = database->create_statement(
+		"SELECT * FROM ResourceType;");
+	return Iterator<ResourceType>(*this, statement);
+}
+
+twoflower::Brochure::Iterator<twoflower::ResourceType>
+twoflower::Brochure::resource_types_end() const
+{
+	return Iterator<ResourceType>();
+}
+
 void twoflower::Brochure::create()
 {
 	Table action_definition("ActionDefinition");
@@ -244,6 +306,29 @@ void twoflower::Brochure::create()
 bool twoflower::Brochure::IteratorImpl<twoflower::ActionDefinition>::next(
 	Statement& statement,
 	ActionDefinition& value)
+{
+	if (!statement.next())
+	{
+		return false;
+	}
+	else
+	{
+		int id;
+		statement.get("id", id);
+
+		std::string name;
+		statement.get("name", name);
+
+		value.set_id(id);
+		value.set_name(name);
+
+		return true;
+	}
+}
+
+bool twoflower::Brochure::IteratorImpl<twoflower::ResourceType>::next(
+	Statement& statement,
+	ResourceType& value)
 {
 	if (!statement.next())
 	{

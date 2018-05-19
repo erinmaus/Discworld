@@ -14,6 +14,7 @@
 #include "twoflower/id.hpp"
 #include "twoflower/relationships/actionDefinition.hpp"
 #include "twoflower/relationships/action.hpp"
+#include "twoflower/relationships/resourceType.hpp"
 
 namespace twoflower
 {
@@ -42,6 +43,14 @@ namespace twoflower
 		Iterator<Action> actions_end() const;
 		Iterator<Action> actions_by_definition(
 			const ActionDefinition& action_definition) const;
+
+		ResourceType create_resource_type(const std::string& name);
+		bool try_get_resource_type(
+			const ID& id,
+			ResourceType& Result) const;
+
+		Iterator<ResourceType> resource_types_begin() const;
+		Iterator<ResourceType> resource_types_end() const;
 
 		void create();
 
