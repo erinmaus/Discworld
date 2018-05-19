@@ -234,6 +234,108 @@ twoflower::Brochure::resource_types_end() const
 	return Iterator<ResourceType>();
 }
 
+twoflower::Resource twoflower::Brochure::create_resource(
+	const ResourceType& resource_type,
+	const std::string& name,
+	bool is_singleton)
+{
+	twoflower::Resource result;
+	auto statement = database->create_statement(
+		"INSERT INTO Resource(resource_type_id, name, singleton)"
+		" VALUES (?, ?, ?);");
+	statement.bind(1, (int)resource_type.get_id());
+	statement.bind(2, name);
+	statement.bind(3, is_singleton);
+
+	statement.execute();
+
+	auto id_statement = database->create_statement(
+		"SELECT last_insert_rowid();");
+	id_statement.next();
+
+	int id;
+	id_statement.get(0, id);
+
+	result.set_id(id);
+	result.set_name(name);
+	result.set_is_singleton(is_singleton);
+
+	return result;
+}
+
+bool twoflower::Brochure::try_get_resource(const ID& id, Resource& result)
+{
+	auto statement = database->create_statement(
+		"SELECT name, singleton FROM Resource WHERE id = ?;");
+	statement.bind(1, (int)id);
+
+	if (statement.next())
+	{
+		std::string name;
+		statement.get("name", name);
+
+		int is_singleton;
+		statement.get("singleton", is_singleton);
+
+		result.set_id(id);
+		result.set_name(name);
+		result.set_is_singleton(is_singleton);
+
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+twoflower::ResourceType twoflower::Brochure::get_resource_type(
+	const Resource& resource)
+{
+	ResourceType result;
+
+	auto statement = database->create_statement(
+		"SELECT resource_type_id FROM Resource WHERE id = ?;");
+	statement.bind(1, (int)resource.get_id());
+
+	if (statement.next())
+	{
+		int id;
+		statement.get("resource_type_id", id);
+
+		if (try_get_resource_type(id, result))
+		{
+			return result;
+		}
+	}
+
+	throw std::runtime_error("resource does not exist in brochure");
+}
+
+twoflower::Brochure::Iterator<twoflower::Resource>
+twoflower::Brochure::resources_begin() const
+{
+	auto statement = database->create_statement(
+		"SELECT name, singleton FROM Resource;");
+	return Iterator<Resource>(*this, statement);
+}
+
+twoflower::Brochure::Iterator<twoflower::Resource>
+twoflower::Brochure::resources_end() const
+{
+	return Iterator<Resource>();
+}
+
+twoflower::Brochure::Iterator<twoflower::Resource>
+twoflower::Brochure::resources_by_type(
+	const ResourceType& resource_type) const
+{
+	auto statement = database->create_statement(
+		"SELECT name, singleton FROM Resource WHERE resource_type_id = ?;");
+	statement.bind(1, (int)resource_type.get_id());
+	return Iterator<Resource>(*this, statement);
+}
+
 void twoflower::Brochure::create()
 {
 	Table action_definition("ActionDefinition");
@@ -363,6 +465,33 @@ bool twoflower::Brochure::IteratorImpl<twoflower::Action>::next(
 		statement.get("id", id);
 
 		value.set_id(id);
+
+		return true;
+	}
+}
+
+bool twoflower::Brochure::IteratorImpl<twoflower::Resource>::next(
+	Statement& statement,
+	Resource& value)
+{
+	if (!statement.next())
+	{
+		return false;
+	}
+	else
+	{
+		int id;
+		statement.get("id", id);
+
+		std::string name;
+		statement.get("name", name);
+
+		int is_singleton;
+		statement.get("singleton", is_singleton);
+
+		value.set_id(id);
+		value.set_name(name);
+		value.set_is_singleton(is_singleton);
 
 		return true;
 	}

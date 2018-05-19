@@ -14,6 +14,7 @@
 #include "twoflower/id.hpp"
 #include "twoflower/relationships/actionDefinition.hpp"
 #include "twoflower/relationships/action.hpp"
+#include "twoflower/relationships/resource.hpp"
 #include "twoflower/relationships/resourceType.hpp"
 
 namespace twoflower
@@ -52,6 +53,18 @@ namespace twoflower
 		Iterator<ResourceType> resource_types_begin() const;
 		Iterator<ResourceType> resource_types_end() const;
 
+		Resource create_resource(
+			const ResourceType& resource_type,
+			const std::string& name,
+			bool is_singleton);
+		bool try_get_resource(const ID& id, Resource& result);
+		ResourceType get_resource_type(const Resource& resource);
+
+		Iterator<Resource> resources_begin() const;
+		Iterator<Resource> resources_end() const;
+		Iterator<Resource> resources_by_type(
+			const ResourceType& resource_type) const;
+
 		void create();
 
 	private:
@@ -75,6 +88,12 @@ namespace twoflower
 		struct IteratorImpl<Action>
 		{
 			static bool next(Statement& statement, Action& value);
+		};
+
+		template <>
+		struct IteratorImpl<ResourceType>
+		{
+			static bool next(Statement& statement, ResourceType& value);
 		};
 
 		std::shared_ptr<Database> database;
