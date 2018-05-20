@@ -172,6 +172,19 @@ twoflower::Brochure::actions_by_definition(
 	return Iterator<Action>(*this, statement);
 }
 
+twoflower::Brochure::Iterator<twoflower::Action>
+twoflower::Brochure::actions_by_resource(
+	const Resource& resource) const
+{
+	auto statement = database->create_statement(
+		"SELECT id FROM Action"
+		" INNER JOIN ResourcesActions"
+		" ON ResourcesActions.resource_id = ?"
+		" AND ResourcesActions.action_id = Action.id;");
+	statement.bind(1, (int)resource.get_id());
+	return Iterator<Action>(*this, statement);
+}
+
 twoflower::ResourceType twoflower::Brochure::create_resource_type(
 	const std::string& name)
 {
@@ -336,6 +349,19 @@ twoflower::Brochure::resources_by_type(
 	return Iterator<Resource>(*this, statement);
 }
 
+void twoflower::Brochure::connect(
+	const Action& action,
+	const Resource& resource)
+{
+	auto statement = database->create_statement(
+		"INSERT INTO ResourcesActions (resource_id, action_id)"
+		" VALUES(?, ?);");
+	statement.bind(1, (int)action.get_id());
+	statement.bind(2, (int)resource.get_id());
+
+	statement.execute();
+}
+
 void twoflower::Brochure::create()
 {
 	Table action_definition("ActionDefinition");
@@ -360,7 +386,7 @@ void twoflower::Brochure::create()
 	Table resource("Resource");
 	resource.add_primary_key("id", Table::Type::integer);
 	resource.add_column("resource_type_id", Table::Type::integer, false, false);
-	resource.add_column("name", Table::Type::text, false, true);
+	resource.add_column("name", Table::Type::text, false, false);
 	resource.add_column("singleton", Table::Type::integer, false, false);
 	resource.bind_foreign_key(
 		"ResourceType",

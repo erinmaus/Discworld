@@ -44,6 +44,8 @@ namespace twoflower
 		Iterator<Action> actions_end() const;
 		Iterator<Action> actions_by_definition(
 			const ActionDefinition& action_definition) const;
+		Iterator<Action> actions_by_resource(
+			const Resource& resource) const;
 
 		ResourceType create_resource_type(const std::string& name);
 		bool try_get_resource_type(
@@ -64,6 +66,8 @@ namespace twoflower
 		Iterator<Resource> resources_end() const;
 		Iterator<Resource> resources_by_type(
 			const ResourceType& resource_type) const;
+
+		void connect(const Action& action, const Resource& resource);
 
 		void create();
 

@@ -10,7 +10,7 @@
 #include <stdexcept>
 #include "twoflower/brochure.hpp"
 
-int main(int argc, const char* argv[])
+int main(int argc, const char* argv[]) try
 {
 	twoflower::Brochure brochure(":memory:");
 	brochure.create();
@@ -78,6 +78,26 @@ int main(int argc, const char* argv[])
 		{
 			auto action_definition = brochure.get_action_definition(*i);
 			std::printf(
+				"- '%s' (id: %d)\n",
+				action_definition.get_name().c_str(),
+				(int)i->get_id());
+		}
+	}
+
+	auto item_resource_type = brochure.create_resource_type("item");
+	auto helmet_item_resource = brochure.create_resource(
+		item_resource_type, "Iron helmet", false);
+	brochure.connect(smith_action, helmet_item_resource);
+
+	std::printf("actions for iron helmet:\n");
+	{
+		auto begin = brochure.actions_by_resource(helmet_item_resource);
+		auto end = brochure.actions_end();
+
+		for (auto i = begin; i != end; ++i)
+		{
+			auto action_definition = brochure.get_action_definition(*i);
+			std::printf(
 				"- '%s' (id: %d)",
 				action_definition.get_name().c_str(),
 				(int)i->get_id());
@@ -85,4 +105,8 @@ int main(int argc, const char* argv[])
 	}
 
 	return 0;
+}
+catch (std::exception& ex)
+{
+	std::printf("%s\n", ex.what());
 }
