@@ -8,6 +8,7 @@
 
 #include <cassert>
 #include <stdexcept>
+#include <sstream>
 #include "twoflower/brochure.hpp"
 #include "brochure/detail/database.hpp"
 #include "brochure/detail/statement.hpp"
@@ -108,7 +109,7 @@ twoflower::Action twoflower::Brochure::create_action(
 	return result;
 }
 
-bool twoflower::Brochure::try_get_action(const ID& id, Action& result)
+bool twoflower::Brochure::try_get_action(const ID& id, Action& result) const
 {
 	auto statement = database->create_statement(
 		"SELECT 1 FROM Action WHERE id = ?;");
@@ -126,7 +127,7 @@ bool twoflower::Brochure::try_get_action(const ID& id, Action& result)
 }
 
 twoflower::ActionDefinition twoflower::Brochure::get_action_definition(
-	const Action& action)
+	const Action& action) const
 {
 	ActionDefinition result;
 
@@ -276,7 +277,7 @@ twoflower::Resource twoflower::Brochure::create_resource(
 	return result;
 }
 
-bool twoflower::Brochure::try_get_resource(const ID& id, Resource& result)
+bool twoflower::Brochure::try_get_resource(const ID& id, Resource& result) const
 {
 	auto statement = database->create_statement(
 		"SELECT name, singleton FROM Resource WHERE id = ?;");
@@ -303,7 +304,7 @@ bool twoflower::Brochure::try_get_resource(const ID& id, Resource& result)
 }
 
 twoflower::ResourceType twoflower::Brochure::get_resource_type(
-	const Resource& resource)
+	const Resource& resource) const
 {
 	ResourceType result;
 
@@ -360,6 +361,105 @@ void twoflower::Brochure::connect(
 	statement.bind(2, (int)resource.get_id());
 
 	statement.execute();
+}
+
+void twoflower::Brochure::connect(
+	ActionConstraint::Type type,
+	const Action& action,
+	const Resource& resource,
+	float quantity)
+{
+	std::stringstream query;
+
+	query << "INSERT INTO ";
+	query << constraint_type_to_table_name(type);
+
+	query << "(resource_id, action_id, count)";
+	query << " VALUES(?, ?, ?);";
+
+	auto statement = database->create_statement(query.str());
+	statement.bind(1, (int)action.get_id());
+	statement.bind(2, (int)resource.get_id());
+	statement.bind(3, quantity);
+
+	statement.execute();
+}
+
+twoflower::Brochure::Iterator<twoflower::ActionConstraint>
+twoflower::Brochure::action_constraints(
+	ActionConstraint::Type type,
+	const Action& action) const
+{
+	std::stringstream query;
+	query << "SELECT id, count FROM ";
+	query << constraint_type_to_table_name(type);
+	query << " WHERE action_id = ?;";
+
+	auto statement = database->create_statement(query.str());
+	statement.bind(1, (int)action.get_id());
+
+	return Iterator<twoflower::ActionConstraint>(
+		*this,
+		statement,
+		ActionConstraint(type));
+}
+
+twoflower::Brochure::Iterator<twoflower::ActionConstraint>
+twoflower::Brochure::action_constraints_end() const
+{
+	return Iterator<twoflower::ActionConstraint>();
+}
+
+twoflower::Action twoflower::Brochure::get_constraint_action(
+	const ActionConstraint& constraint) const
+{
+	std::stringstream query;
+	query << "SELECT action_id FROM ";
+	query << constraint_type_to_table_name(constraint.get_type());
+	query << " WHERE id = ?;";
+
+	auto statement = database->create_statement(query.str());
+	statement.bind(1, (int)constraint.get_id());
+
+	if (statement.next())
+	{
+		int id;
+		statement.get("action_id", id);
+
+		twoflower::Action result;
+		if (try_get_action(id, result))
+		{
+			return result;
+		}
+	}
+
+	throw std::runtime_error("bad logic! missing action for constraint");
+}
+
+twoflower::Resource twoflower::Brochure::get_constraint_resource(
+	const ActionConstraint& constraint) const
+{
+	std::stringstream query;
+	query << "SELECT resource_id FROM ";
+	query << constraint_type_to_table_name(constraint.get_type());
+	query << " WHERE id = ?;";
+
+	auto statement = database->create_statement(query.str());
+	statement.bind(1, (int)constraint.get_id());
+
+	if (statement.next())
+	{
+		int id;
+		statement.get("resource_id", id);
+
+		twoflower::Resource result;
+		if (try_get_resource(id, result))
+		{
+			return result;
+		}
+	}
+
+	throw std::runtime_error("bad logic! missing resource for constraint");
 }
 
 void twoflower::Brochure::create()
@@ -429,6 +529,27 @@ void twoflower::Brochure::create()
 
 	Table action_requirement("ActionRequirement", action_constraint);
 	action_requirement.create(*database);
+}
+
+std::string twoflower::Brochure::constraint_type_to_table_name(
+	ActionConstraint::Type type)
+{
+	switch (type)
+	{
+		case ActionConstraint::Type::input:
+			return "ActionInput";
+			break;
+		case ActionConstraint::Type::output:
+			return "ActionOutput";
+			break;
+		case ActionConstraint::Type::requirement:
+			return "ActionRequirement";
+			break;
+		default:
+			throw std::runtime_error(
+				"unknown action constraint type;"
+				" expected input, output, or requirement.");
+	}
 }
 
 bool twoflower::Brochure::IteratorImpl<twoflower::ActionDefinition>::next(
@@ -518,6 +639,29 @@ bool twoflower::Brochure::IteratorImpl<twoflower::Resource>::next(
 		value.set_id(id);
 		value.set_name(name);
 		value.set_is_singleton(is_singleton);
+
+		return true;
+	}
+}
+
+bool twoflower::Brochure::IteratorImpl<twoflower::ActionConstraint>::next(
+	Statement& statement,
+	ActionConstraint& value)
+{
+	if (!statement.next())
+	{
+		return false;
+	}
+	else
+	{
+		int id;
+		statement.get("id", id);
+
+		float count;
+		statement.get("count", count);
+
+		value.set_id(id);
+		value.set_count(count);
 
 		return true;
 	}

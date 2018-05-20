@@ -12,6 +12,7 @@
 #include <iterator>
 #include <memory>
 #include "twoflower/id.hpp"
+#include "twoflower/relationships/actionConstraint.hpp"
 #include "twoflower/relationships/actionDefinition.hpp"
 #include "twoflower/relationships/action.hpp"
 #include "twoflower/relationships/resource.hpp"
@@ -37,8 +38,8 @@ namespace twoflower
 		Iterator<ActionDefinition> action_definitions_end() const;
 
 		Action create_action(const ActionDefinition& action_definition);
-		bool try_get_action(const ID& id, Action& result);
-		ActionDefinition get_action_definition(const Action& action);
+		bool try_get_action(const ID& id, Action& result) const;
+		ActionDefinition get_action_definition(const Action& action) const;
 
 		Iterator<Action> actions_begin() const;
 		Iterator<Action> actions_end() const;
@@ -59,8 +60,8 @@ namespace twoflower
 			const ResourceType& resource_type,
 			const std::string& name,
 			bool is_singleton);
-		bool try_get_resource(const ID& id, Resource& result);
-		ResourceType get_resource_type(const Resource& resource);
+		bool try_get_resource(const ID& id, Resource& result) const;
+		ResourceType get_resource_type(const Resource& resource) const;
 
 		Iterator<Resource> resources_begin() const;
 		Iterator<Resource> resources_end() const;
@@ -69,12 +70,29 @@ namespace twoflower
 
 		void connect(const Action& action, const Resource& resource);
 
+		void connect(
+			ActionConstraint::Type type,
+			const Action& action,
+			const Resource& resource,
+			float quantity);
+
+		Iterator<ActionConstraint> action_constraints(
+			ActionConstraint::Type type,
+			const Action& action) const;
+		Iterator<ActionConstraint> action_constraints_end() const;
+
+		Action get_constraint_action(const ActionConstraint& constraint) const;
+		Resource get_constraint_resource(const ActionConstraint& constraint) const;
+
 		void create();
 
 	private:
 		class Database;
 		class Statement;
 		class Table;
+
+		static std::string constraint_type_to_table_name(
+			ActionConstraint::Type type);
 
 		template <typename T>
 		struct IteratorImpl
@@ -98,6 +116,12 @@ namespace twoflower
 		struct IteratorImpl<ResourceType>
 		{
 			static bool next(Statement& statement, ResourceType& value);
+		};
+
+		template <>
+		struct IteratorImpl<ActionConstraint>
+		{
+			static bool next(Statement& statement, ActionConstraint& value);
 		};
 
 		std::shared_ptr<Database> database;
@@ -130,6 +154,10 @@ namespace twoflower
 		explicit Iterator(
 			const Brochure& brochure,
 			Statement& statement);
+		explicit Iterator(
+			const Brochure& brochure,
+			Statement& statement,
+			const T& value);
 		void next();
 
 		const Brochure* brochure = nullptr;
@@ -145,6 +173,17 @@ twoflower::Brochure::Iterator<T>::Iterator(
 		brochure(&brochure),
 		statement(new Statement(statement)),
 		end(false)
+{
+	next();
+}
+
+template <typename T>
+twoflower::Brochure::Iterator<T>::Iterator(
+	const Brochure& brochure, Statement& statement, const T& value) :
+		brochure(&brochure),
+		statement(new Statement(statement)),
+		end(false),
+		value(value)
 {
 	next();
 }

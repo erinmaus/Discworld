@@ -8,6 +8,12 @@
 
 #include "twoflower/relationships/actionConstraint.hpp"
 
+twoflower::ActionConstraint::ActionConstraint(Type type) :
+	type(type)
+{
+	// Nothing.
+}
+
 twoflower::ActionConstraint::ActionConstraint(
 	const ID& id,
 	Type type,

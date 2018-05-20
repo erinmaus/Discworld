@@ -88,6 +88,7 @@ int main(int argc, const char* argv[]) try
 	auto helmet_item_resource = brochure.create_resource(
 		item_resource_type, "Iron helmet", false);
 	brochure.connect(smith_action, helmet_item_resource);
+	brochure.connect(twoflower::ActionConstraint::Type::output, smith_action, helmet_item_resource, 1);
 
 	std::printf("actions for iron helmet:\n");
 	{
@@ -98,9 +99,19 @@ int main(int argc, const char* argv[]) try
 		{
 			auto action_definition = brochure.get_action_definition(*i);
 			std::printf(
-				"- '%s' (id: %d)",
+				"- '%s' (id: %d)\n",
 				action_definition.get_name().c_str(),
 				(int)i->get_id());
+
+			auto outputs_begin = brochure.action_constraints(twoflower::ActionConstraint::Type::output, *i);
+			auto outputs_end = brochure.action_constraints_end();
+
+			std::printf("  outputs:\n");
+			for (auto j = outputs_begin; j != outputs_end; ++j)
+			{
+				auto resource = brochure.get_constraint_resource(*j);
+				std::printf("  - %.0fx '%s'\n", j->get_count(), resource.get_name().c_str());
+			}
 		}
 	}
 

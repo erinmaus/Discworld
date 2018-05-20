@@ -26,6 +26,7 @@ namespace twoflower
 		};
 
 		ActionConstraint() = default;
+		explicit ActionConstraint(Type type);
 		ActionConstraint(
 			const ID& id,
 			Type type,
