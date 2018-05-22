@@ -13,6 +13,7 @@
 #include <vector>
 #include <sqlite3.h>
 #include "twoflower/brochure.hpp"
+#include "twoflower/meta/recordValue.hpp"
 
 namespace twoflower
 {
@@ -30,6 +31,8 @@ namespace twoflower
 		void bind(int parameter, const std::string& value);
 		void bind(const std::string& parameter, const std::vector<std::uint8_t>& value);
 		void bind(int parameter, const std::vector<std::uint8_t>& value);
+		void bind(const std::string& parameter, const RecordValue& value);
+		void bind(int parameter, const RecordValue& value);
 
 		int execute();
 		bool next();
@@ -42,6 +45,7 @@ namespace twoflower
 		void get(int column, std::string& value);
 		void get(const std::string& column, std::vector<std::uint8_t>& value);
 		void get(int column, std::vector<std::uint8_t>& value);
+		void get(const std::string& column, RecordValue& value);
 		bool empty(const std::string& column);
 		bool empty(int column);
 

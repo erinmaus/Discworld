@@ -6,8 +6,11 @@
 //
 // Copyright [bk]door.maus
 
+#include <cassert>
 #include <cstring>
 #include <sqlite3.h>
+#include "twoflower/relationships/action.hpp"
+#include "twoflower/relationships/resource.hpp"
 #include "statement.hpp"
 
 twoflower::Brochure::Statement::Statement(sqlite3* database, const std::string& query) :
@@ -107,6 +110,74 @@ void twoflower::Brochure::Statement::bind(int parameter, const std::vector<std::
 	if (result != SQLITE_OK)
 	{
 		throw std::runtime_error(sqlite3_errmsg(database));
+	}
+}
+
+void twoflower::Brochure::Statement::bind(const std::string& parameter, const RecordValue& value)
+{
+	bind(sqlite3_bind_parameter_index(statement.get(), parameter.c_str()), value);
+}
+
+void twoflower::Brochure::Statement::bind(int parameter, const RecordValue& value)
+{
+	switch (value.get_type())
+	{
+		case RecordDefinition::Type::integer:
+			{
+				int v;
+				bool success = value.get(v);
+				assert(success && "RecordValue type/value mismatch (integer)");
+
+				bind(parameter, v);
+			}
+			break;
+		case RecordDefinition::Type::real:
+			{
+				float v;
+				bool success = value.get(v);
+				assert(success && "RecordValue type/value mismatch (real)");
+
+				bind(parameter, v);
+			}
+			break;
+		case RecordDefinition::Type::text:
+			{
+				std::string v;
+				bool success = value.get(v);
+				assert(success && "RecordValue type/value mismatch (text)");
+
+				bind(parameter, v);
+			}
+			break;
+		case RecordDefinition::Type::blob:
+			{
+				std::vector<std::uint8_t> v;
+				bool success = value.get(v);
+				assert(success && "RecordValue type/value mismatch (text)");
+
+				bind(parameter, v);
+			}
+			break;
+		case RecordDefinition::Type::action:
+			{
+				Action v;
+				bool success = value.get(v);
+				assert(success && "RecordValue type/value mismatch (Action)");
+
+				bind(parameter, (int)v.get_id());
+			}
+			break;
+		case RecordDefinition::Type::resource:
+			{
+				Resource v;
+				bool success = value.get(v);
+				assert(success && "RecordValue type/value mismatch (Resource)");
+
+				bind(parameter, (int)v.get_id());
+			}
+			break;
+		default:
+			throw std::runtime_error("unknown RecordValue type");
 	}
 }
 
