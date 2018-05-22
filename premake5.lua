@@ -24,6 +24,8 @@ solution "Discworld"
 		language "C++"
 		kind "StaticLib"
 
+		cppdialect "C++17"
+
 		configuration "Debug"
 			targetsuffix "_debug"
 			objdir "obj/twoflower/debug"
