@@ -531,6 +531,66 @@ void twoflower::Brochure::create()
 	action_requirement.create(*database);
 }
 
+// Returning the Table::Type cast to an int is a terrible hack.
+// We can't expose the internal type Brochure::Table in the public
+// header... Thus, we need an intermediate type that *is* public as
+// the return type. An integer works for this purpose.
+//
+// It just involves a lot of ugly casting...
+int twoflower::Brochure::record_definition_type_to_table_type(
+	twoflower::RecordDefinition::Type type)
+{
+	switch (type)
+	{
+		case twoflower::RecordDefinition::Type::integer:
+		case twoflower::RecordDefinition::Type::action:
+		case twoflower::RecordDefinition::Type::resource:
+			return (int)twoflower::Brochure::Table::Type::integer;
+		case twoflower::RecordDefinition::Type::text:
+			return (int)twoflower::Brochure::Table::Type::text;
+		case twoflower::RecordDefinition::Type::real:
+			return (int)twoflower::Brochure::Table::Type::real;
+		case twoflower::RecordDefinition::Type::blob:
+			return (int)twoflower::Brochure::Table::Type::blob;
+		default:
+			throw std::runtime_error("unrecognized record type");
+	}
+}
+
+void twoflower::Brochure::create(const RecordDefinition& record)
+{
+	assert(record.count() > 0 && "record malformed");
+
+	Table table(std::string("meta_") + record.get_name());
+
+	// Column 0 is always the primary key.
+	table.add_primary_key(
+		record.get_name(0),
+		(Table::Type)record_definition_type_to_table_type(record.get_type(0)));
+
+	// Since we added Column 0 as primary key, start at Column 1.
+	for (std::size_t i = 1; i < record.count(); ++i)
+	{
+		table.add_column(
+			record.get_name(i),
+			(Table::Type)record_definition_type_to_table_type(record.get_type(i)),
+			true,
+			false);
+
+		switch (record.get_type(i))
+		{
+			case RecordDefinition::Type::resource:
+				table.bind_foreign_key("Resource", record.get_name(i), "id");
+				break;
+			case RecordDefinition::Type::action:
+				table.bind_foreign_key("Action", record.get_name(i), "id");
+				break;
+		}
+	}
+
+	table.create(*database);
+}
+
 std::string twoflower::Brochure::constraint_type_to_table_name(
 	ActionConstraint::Type type)
 {

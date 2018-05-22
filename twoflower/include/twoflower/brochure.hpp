@@ -12,6 +12,7 @@
 #include <iterator>
 #include <memory>
 #include "twoflower/id.hpp"
+#include "twoflower/meta/recordDefinition.hpp"
 #include "twoflower/relationships/actionConstraint.hpp"
 #include "twoflower/relationships/actionDefinition.hpp"
 #include "twoflower/relationships/action.hpp"
@@ -85,12 +86,14 @@ namespace twoflower
 		Resource get_constraint_resource(const ActionConstraint& constraint) const;
 
 		void create();
+		void create(const RecordDefinition& definition);
 
 	private:
 		class Database;
 		class Statement;
 		class Table;
 
+		static int record_definition_type_to_table_type(RecordDefinition::Type type);
 		static std::string constraint_type_to_table_name(
 			ActionConstraint::Type type);
 
