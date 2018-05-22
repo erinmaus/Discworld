@@ -58,3 +58,8 @@ std::size_t twoflower::RecordDefinition::get_index(
 
 	return iter->second;
 }
+
+bool twoflower::RecordDefinition::has_index(const std::string& column) const
+{
+	return columns.find(column) != columns.end();
+}

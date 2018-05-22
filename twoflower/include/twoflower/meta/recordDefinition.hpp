@@ -42,6 +42,7 @@ namespace twoflower
 		Type get_type(std::size_t index) const;
 
 		std::size_t get_index(const std::string& column) const;
+		bool has_index(const std::string& column) const;
 
 	private:
 		std::string name;
