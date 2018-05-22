@@ -156,7 +156,7 @@ namespace twoflower
 
 		typedef std::input_iterator_tag iteratory_category;
 		typedef std::size_t difference_type;
-		typedef T* pointer;
+		typedef const T* pointer;
 		typedef const T& value_type;
 
 		Iterator() = default;
@@ -167,7 +167,7 @@ namespace twoflower
 		bool operator ==(const Iterator& other) const;
 		bool operator !=(const Iterator& other) const;
 
-		const pointer operator ->() const;
+		pointer operator ->() const;
 		value_type operator *() const;
 
 	private:
@@ -245,7 +245,7 @@ bool twoflower::Brochure::Iterator<T>::operator !=(
 }
 
 template <typename T>
-const typename twoflower::Brochure::Iterator<T>::pointer
+typename twoflower::Brochure::Iterator<T>::pointer
 twoflower::Brochure::Iterator<T>::operator ->() const
 {
 	return &value;
