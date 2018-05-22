@@ -58,6 +58,8 @@ solution "Discworld"
 		language "C++"
 		kind "ConsoleApp"
 
+		cppdialect "C++17"
+
 		configuration "Debug"
 			targetsuffix "_debug"
 			objdir "obj/twoflower_test/debug"

@@ -86,11 +86,11 @@ int main(int argc, const char* argv[]) try
 
 	auto item_resource_type = brochure.create_resource_type("item");
 	auto helmet_item_resource = brochure.create_resource(
-		item_resource_type, "Iron helmet", false);
+		item_resource_type, "Iron full helm", false);
 	brochure.connect(smith_action, helmet_item_resource);
 	brochure.connect(twoflower::ActionConstraint::Type::output, smith_action, helmet_item_resource, 1);
 
-	std::printf("actions for iron helmet:\n");
+	std::printf("actions for Iron full helm:\n");
 	{
 		auto begin = brochure.actions_by_resource(helmet_item_resource);
 		auto end = brochure.actions_end();
@@ -113,6 +113,39 @@ int main(int argc, const char* argv[]) try
 				std::printf("  - %.0fx '%s'\n", j->get_count(), resource.get_name().c_str());
 			}
 		}
+	}
+
+	twoflower::RecordDefinition definition("Equipment");
+	definition.define("stab", twoflower::RecordDefinition::Type::integer);
+	definition.define("slash", twoflower::RecordDefinition::Type::integer);
+	definition.define("crush", twoflower::RecordDefinition::Type::integer);
+	definition.define("item", twoflower::RecordDefinition::Type::resource);
+
+	brochure.create(definition);
+
+	twoflower::Record record(definition);
+	record.set("stab", 6);
+	record.set("slash", 7);
+	record.set("crush", 5);
+	record.set("item", helmet_item_resource);
+
+	brochure.insert(definition, record);
+
+	twoflower::Query query(definition);
+	query.set("item", helmet_item_resource);
+	auto results = brochure.select(definition, query);
+	std::printf("equipment:\n");
+	for (auto& i: results)
+	{
+		twoflower::Resource resource;
+		int stab = 0, slash = 0, crush = 0;
+		i.get("item", resource);
+		i.get("stab", stab);
+		i.get("slash", slash);
+		i.get("crush", crush);
+
+		std::printf("- item: '%s', ", resource.get_name().c_str());
+		std::printf("stab: %d, slash: %d, crush: %d\n", stab, slash, crush);
 	}
 
 	return 0;
