@@ -12,7 +12,9 @@
 #include <iterator>
 #include <memory>
 #include "twoflower/id.hpp"
+#include "twoflower/meta/record.hpp"
 #include "twoflower/meta/recordDefinition.hpp"
+#include "twoflower/meta/query.hpp"
 #include "twoflower/relationships/actionConstraint.hpp"
 #include "twoflower/relationships/actionDefinition.hpp"
 #include "twoflower/relationships/action.hpp"
@@ -88,10 +90,26 @@ namespace twoflower
 		void create();
 		void create(const RecordDefinition& definition);
 
+		void insert(const RecordDefinition& definition, const Record& record);
+
+		static const int UNLIMITED_POWER = -1;
+		std::vector<Record> select(
+			const RecordDefinition& definition,
+			const Query& query,
+			int limit = UNLIMITED_POWER) const;
+		Record select_one(
+			const RecordDefinition& definition,
+			const Query& query) const;
+
 	private:
 		class Database;
 		class Statement;
 		class Table;
+
+		void statement_to_record(
+			const Statement& statement,
+			const RecordDefinition& definition,
+			Record& result) const;
 
 		static int record_definition_type_to_table_type(RecordDefinition::Type type);
 		static std::string constraint_type_to_table_name(

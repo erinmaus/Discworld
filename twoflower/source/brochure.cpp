@@ -531,32 +531,6 @@ void twoflower::Brochure::create()
 	action_requirement.create(*database);
 }
 
-// Returning the Table::Type cast to an int is a terrible hack.
-// We can't expose the internal type Brochure::Table in the public
-// header... Thus, we need an intermediate type that *is* public as
-// the return type. An integer works for this purpose.
-//
-// It just involves a lot of ugly casting...
-int twoflower::Brochure::record_definition_type_to_table_type(
-	twoflower::RecordDefinition::Type type)
-{
-	switch (type)
-	{
-		case twoflower::RecordDefinition::Type::integer:
-		case twoflower::RecordDefinition::Type::action:
-		case twoflower::RecordDefinition::Type::resource:
-			return (int)twoflower::Brochure::Table::Type::integer;
-		case twoflower::RecordDefinition::Type::text:
-			return (int)twoflower::Brochure::Table::Type::text;
-		case twoflower::RecordDefinition::Type::real:
-			return (int)twoflower::Brochure::Table::Type::real;
-		case twoflower::RecordDefinition::Type::blob:
-			return (int)twoflower::Brochure::Table::Type::blob;
-		default:
-			throw std::runtime_error("unrecognized record type");
-	}
-}
-
 void twoflower::Brochure::create(const RecordDefinition& record)
 {
 	assert(record.count() > 0 && "record malformed");
@@ -589,6 +563,225 @@ void twoflower::Brochure::create(const RecordDefinition& record)
 	}
 
 	table.create(*database);
+}
+
+void twoflower::Brochure::insert(
+	const RecordDefinition& definition,
+	const Record& record)
+{
+	std::stringstream query;
+	query << "INSERT INTO meta_" << definition.get_name();
+
+	query << "(";
+	for (std::size_t i = 1; i < definition.count(); ++i)
+	{
+		query << definition.get_name(i);
+		if (i + 1 < definition.count())
+		{
+			query << ", ";
+		}
+	}
+	query << ")";
+
+	query << " VALUES (";
+	for (std::size_t i = 1; i < definition.count(); ++i)
+	{
+		query << "?";
+		if (i + 1 < definition.count())
+		{
+			query << ", ";
+		}
+	}
+	query << ");";
+
+	auto statement = database->create_statement(query.str());
+	for (std::size_t i = 1; i < definition.count(); ++i)
+	{
+		RecordValue column_value;
+		if (!record.get(i, column_value))
+		{
+			column_value.make_default(definition.get_type(i));
+		}
+
+		statement.bind((int)i, column_value);
+	}
+
+	statement.execute();
+}
+
+std::vector<twoflower::Record> twoflower::Brochure::select(
+	const RecordDefinition& definition,
+	const Query& query,
+	int limit) const
+{
+	std::stringstream query_statement;
+	{
+		query_statement << "SELECT * FROM meta_" << definition.get_name();
+
+		if (!query.empty())
+		{
+			query_statement << " WHERE";
+
+			auto current = query.begin();
+			while (current != query.end())
+			{
+				query_statement << " " << definition.get_name(current->first) << " = ?";
+
+				++current;
+
+				if (current != query.end())
+				{
+					query_statement << " AND";
+				}
+			}
+		}
+
+		if (limit != UNLIMITED_POWER)
+		{
+			query_statement << " LIMIT " << limit;
+		}
+
+		query_statement << ";";
+	}
+
+	auto statement = database->create_statement(query_statement.str());
+	{
+		int index = 1;
+		for (auto i = query.begin(); i != query.end(); ++i)
+		{
+			statement.bind(index, i->second);
+			++index;
+		}
+	}
+
+	std::vector<Record> results;
+	while (statement.next())
+	{
+		auto& record = results.emplace_back(definition);
+		statement_to_record(statement, definition, record);
+	}
+
+	return results;
+}
+
+twoflower::Record twoflower::Brochure::select_one(
+	const RecordDefinition& definition,
+	const Query& query) const
+{
+	std::vector<Record> results;
+	results = select(definition, query, 1);
+
+	if (results.size() > 0)
+	{
+		return results[0];
+	}
+
+	return Record(definition);
+}
+
+void twoflower::Brochure::statement_to_record(
+	const Statement& statement,
+	const RecordDefinition& definition,
+	Record& result) const
+{
+	for (std::size_t i = 0; i < definition.count(); ++i)
+	{
+		RecordValue value;
+
+		switch (definition.get_type(i))
+		{
+			case RecordDefinition::Type::integer:
+				{
+					int v;
+					statement.get(definition.get_name(i), v);
+					value.set(v);
+				}
+				break;
+			case RecordDefinition::Type::text:
+				{
+					std::string v;
+					statement.get(definition.get_name(i), v);
+					value.set(v);
+				}
+				break;
+			case RecordDefinition::Type::real:
+				{
+					float v;
+					statement.get(definition.get_name(i), v);
+					value.set(v);
+				}
+				break;
+			case RecordDefinition::Type::blob:
+				{
+					std::vector<std::uint8_t> v;
+					statement.get(definition.get_name(i), v);
+					value.set(v);
+				}
+				break;
+			case RecordDefinition::Type::action:
+				{
+					int id;
+					statement.get(definition.get_name(i), id);
+
+					Action v;
+					if (try_get_action(id, v))
+					{
+						value.set(v);
+					}
+					else
+					{
+						value.make_default(RecordDefinition::Type::action);
+					}
+				}
+				break;
+			case RecordDefinition::Type::resource:
+				{
+					int id;
+					statement.get(definition.get_name(i), id);
+
+					Resource v;
+					if (try_get_resource(id, v))
+					{
+						value.set(v);
+					}
+					else
+					{
+						value.make_default(RecordDefinition::Type::resource);
+					}
+				}
+				break;
+			default:
+				throw std::runtime_error("unhandled record column type");
+		}
+
+		result.set(i, value);
+	}
+}
+
+// Returning the Table::Type cast to an int is a terrible hack.
+// We can't expose the internal type Brochure::Table in the public
+// header... Thus, we need an intermediate type that *is* public as
+// the return type. An integer works for this purpose.
+//
+// It just involves a lot of ugly casting...
+int twoflower::Brochure::record_definition_type_to_table_type(
+	twoflower::RecordDefinition::Type type)
+{
+	switch (type)
+	{
+		case twoflower::RecordDefinition::Type::integer:
+		case twoflower::RecordDefinition::Type::action:
+		case twoflower::RecordDefinition::Type::resource:
+			return (int)twoflower::Brochure::Table::Type::integer;
+		case twoflower::RecordDefinition::Type::text:
+			return (int)twoflower::Brochure::Table::Type::text;
+		case twoflower::RecordDefinition::Type::real:
+			return (int)twoflower::Brochure::Table::Type::real;
+		case twoflower::RecordDefinition::Type::blob:
+			return (int)twoflower::Brochure::Table::Type::blob;
+		default:
+			throw std::runtime_error("unrecognized record type");
+	}
 }
 
 std::string twoflower::Brochure::constraint_type_to_table_name(
