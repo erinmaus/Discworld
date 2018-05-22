@@ -31,12 +31,12 @@ namespace twoflower
 		void set(const Action& action);
 		void set(const Resource& action);
 
-		bool get(int& result);
-		bool get(float& result);
-		bool get(std::string& result);
-		bool get(std::vector<std::uint8_t>& result);
-		bool get(Action& result);
-		bool get(Resource& result);
+		bool get(int& result) const;
+		bool get(float& result) const;
+		bool get(std::string& result) const;
+		bool get(std::vector<std::uint8_t>& result) const;
+		bool get(Action& result) const;
+		bool get(Resource& result) const;
 
 		RecordDefinition::Type get_type() const;
 

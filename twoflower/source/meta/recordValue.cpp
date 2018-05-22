@@ -44,7 +44,7 @@ void twoflower::RecordValue::set(const Resource& value)
 	type = RecordDefinition::Type::resource;
 }
 
-bool twoflower::RecordValue::get(int& result)
+bool twoflower::RecordValue::get(int& result) const
 {
 	auto r = std::get_if<int>(&instance);
 	if (r != nullptr)
@@ -56,7 +56,7 @@ bool twoflower::RecordValue::get(int& result)
 	return false;
 }
 
-bool twoflower::RecordValue::get(float& result)
+bool twoflower::RecordValue::get(float& result) const
 {
 	auto r = std::get_if<float>(&instance);
 	if (r != nullptr)
@@ -68,7 +68,7 @@ bool twoflower::RecordValue::get(float& result)
 	return false;
 }
 
-bool twoflower::RecordValue::get(std::string& result)
+bool twoflower::RecordValue::get(std::string& result) const
 {
 	auto r = std::get_if<std::string>(&instance);
 	if (r != nullptr)
@@ -80,7 +80,7 @@ bool twoflower::RecordValue::get(std::string& result)
 	return false;
 }
 
-bool twoflower::RecordValue::get(std::vector<std::uint8_t>& result)
+bool twoflower::RecordValue::get(std::vector<std::uint8_t>& result) const
 {
 	auto r = std::get_if<std::vector<std::uint8_t>>(&instance);
 	if (r != nullptr)
@@ -92,7 +92,7 @@ bool twoflower::RecordValue::get(std::vector<std::uint8_t>& result)
 	return false;
 }
 
-bool twoflower::RecordValue::get(Action& result)
+bool twoflower::RecordValue::get(Action& result) const
 {
 	auto r = std::get_if<Action>(&instance);
 	if (r != nullptr)
@@ -104,7 +104,7 @@ bool twoflower::RecordValue::get(Action& result)
 	return false;
 }
 
-bool twoflower::RecordValue::get(Resource& result)
+bool twoflower::RecordValue::get(Resource& result) const
 {
 	auto r = std::get_if<Resource>(&instance);
 	if (r != nullptr)
