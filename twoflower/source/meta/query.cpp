@@ -84,3 +84,18 @@ bool twoflower::Query::unset(std::size_t index)
 
 	return false;
 }
+
+bool twoflower::Query::empty() const
+{
+	return values.empty();
+}
+
+twoflower::Query::const_iterator twoflower::Query::begin() const
+{
+	return values.begin();
+}
+
+twoflower::Query::const_iterator twoflower::Query::end() const
+{
+	return values.end();
+}

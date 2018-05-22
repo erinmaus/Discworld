@@ -31,6 +31,14 @@ namespace twoflower
 		bool unset(const std::string& column);
 		bool unset(std::size_t index);
 
+		bool empty() const;
+
+		typedef std::unordered_map<
+			std::size_t,
+			RecordValue>::const_iterator const_iterator;
+		const_iterator begin() const;
+		const_iterator end() const;
+
 	private:
 		const RecordDefinition* definition;
 		std::unordered_map<std::size_t, RecordValue> values;
