@@ -214,32 +214,32 @@ bool twoflower::Brochure::Statement::next()
 	return true;
 }
 
-void twoflower::Brochure::Statement::get(const std::string& column, int& value)
+void twoflower::Brochure::Statement::get(const std::string& column, int& value) const
 {
 	return get(get_column_index(column), value);
 }
 
-void twoflower::Brochure::Statement::get(int column, int& value)
+void twoflower::Brochure::Statement::get(int column, int& value) const
 {
 	value = sqlite3_column_int(statement.get(), column);
 }
 
-void twoflower::Brochure::Statement::get(const std::string& column, float& value)
+void twoflower::Brochure::Statement::get(const std::string& column, float& value) const
 {
 	return get(get_column_index(column), value);
 }
 
-void twoflower::Brochure::Statement::get(int column, float& value)
+void twoflower::Brochure::Statement::get(int column, float& value) const
 {
 	value = (float)sqlite3_column_double(statement.get(), column);
 }
 
-void twoflower::Brochure::Statement::get(const std::string& column, std::string& value)
+void twoflower::Brochure::Statement::get(const std::string& column, std::string& value) const
 {
 	return get(get_column_index(column), value);
 }
 
-void twoflower::Brochure::Statement::get(int column, std::string& value)
+void twoflower::Brochure::Statement::get(int column, std::string& value) const
 {
 	auto result = sqlite3_column_text(statement.get(), column);
 	if (result == nullptr)
@@ -252,12 +252,12 @@ void twoflower::Brochure::Statement::get(int column, std::string& value)
 	}
 }
 
-void twoflower::Brochure::Statement::get(const std::string& column, std::vector<std::uint8_t>& value)
+void twoflower::Brochure::Statement::get(const std::string& column, std::vector<std::uint8_t>& value) const
 {
 	return get(get_column_index(column), value);
 }
 
-void twoflower::Brochure::Statement::get(int column, std::vector<std::uint8_t>& value)
+void twoflower::Brochure::Statement::get(int column, std::vector<std::uint8_t>& value) const
 {
 	auto result = sqlite3_column_blob(statement.get(), column);
 	if (result == nullptr)
@@ -272,17 +272,17 @@ void twoflower::Brochure::Statement::get(int column, std::vector<std::uint8_t>& 
 	}
 }
 
-bool twoflower::Brochure::Statement::empty(const std::string& column)
+bool twoflower::Brochure::Statement::empty(const std::string& column) const
 {
 	return empty(get_column_index(column));
 }
 
-bool twoflower::Brochure::Statement::empty(int column)
+bool twoflower::Brochure::Statement::empty(int column) const
 {
 	return sqlite3_column_type(statement.get(), column) == SQLITE_NULL;
 }
 
-int twoflower::Brochure::Statement::get_column_index(const std::string& column)
+int twoflower::Brochure::Statement::get_column_index(const std::string& column) const
 {
 	for (int i = 0; i < sqlite3_column_count(statement.get()); ++i)
 	{

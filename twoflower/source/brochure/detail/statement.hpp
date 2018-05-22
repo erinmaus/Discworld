@@ -37,20 +37,19 @@ namespace twoflower
 		int execute();
 		bool next();
 
-		void get(const std::string& column, float& value);
-		void get(int column, float& value);
-		void get(const std::string& column, int& value);
-		void get(int column, int& value);
-		void get(const std::string& column, std::string& value);
-		void get(int column, std::string& value);
-		void get(const std::string& column, std::vector<std::uint8_t>& value);
-		void get(int column, std::vector<std::uint8_t>& value);
-		void get(const std::string& column, RecordValue& value);
-		bool empty(const std::string& column);
-		bool empty(int column);
+		void get(const std::string& column, float& value) const;
+		void get(int column, float& value) const;
+		void get(const std::string& column, int& value) const;
+		void get(int column, int& value) const;
+		void get(const std::string& column, std::string& value) const;
+		void get(int column, std::string& value) const;
+		void get(const std::string& column, std::vector<std::uint8_t>& value) const;
+		void get(int column, std::vector<std::uint8_t>& value) const;
+		bool empty(const std::string& column) const;
+		bool empty(int column) const;
 
 	private:
-		int get_column_index(const std::string& name);
+		int get_column_index(const std::string& name) const;
 
 		sqlite3* database;
 		std::shared_ptr<sqlite3_stmt> statement;
