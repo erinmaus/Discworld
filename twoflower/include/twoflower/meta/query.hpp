@@ -25,8 +25,20 @@ namespace twoflower
 		bool get(const std::string& column, RecordValue& result) const;
 		bool get(std::size_t index, RecordValue& result) const;
 
+		template <typename T>
+		bool get(const std::string& column, T& result) const;
+
+		template <typename T>
+		bool get(std::size_t index, T& result) const;
+
 		bool set(const std::string& column, const RecordValue& value);
 		bool set(std::size_t index, const RecordValue& value);
+
+		template <typename T>
+		bool set(const std::string& column, const T& result);
+
+		template <typename T>
+		bool set(std::size_t index, const T& result);
 
 		bool unset(const std::string& column);
 		bool unset(std::size_t index);
@@ -43,6 +55,48 @@ namespace twoflower
 		const RecordDefinition* definition;
 		std::unordered_map<std::size_t, RecordValue> values;
 	};
+}
+
+template <typename T>
+bool twoflower::Query::get(const std::string& column, T& result) const
+{
+	RecordValue value;
+	if (get(column, value))
+	{
+		return value.get(result);
+	}
+
+	return false;
+}
+
+template <typename T>
+bool twoflower::Query::get(std::size_t index, T& result) const
+{
+	RecordValue value;
+	if (get(index, value))
+	{
+		return value.get(result);
+	}
+
+	return false;
+}
+
+template <typename T>
+bool twoflower::Query::set(const std::string& column, const T& value)
+{
+	RecordValue v;
+	v.set(value);
+
+	return set(column, v);
+}
+
+template <typename T>
+bool twoflower::Query::set(std::size_t index, const T& value)
+{
+	RecordValue v;
+	v.set(value);
+
+	return set(index, v);
 }
 
 #endif
