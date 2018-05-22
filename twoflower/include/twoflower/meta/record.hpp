@@ -6,8 +6,8 @@
 //
 // Copyright [bk]door.maus
 
-#ifndef TWOFLOWER_RECORD_HPP
-#define TWOFLOWER_RECORD_HPP
+#ifndef TWOFLOWER_META_RECORD_HPP
+#define TWOFLOWER_META_RECORD_HPP
 
 #include <vector>
 #include "twoflower/meta/recordDefinition.hpp"

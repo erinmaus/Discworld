@@ -6,8 +6,8 @@
 //
 // Copyright [bk]door.maus
 
-#ifndef TWOFLOWER_RECORD_VALUE_HPP
-#define TWOFLOWER_RECORD_VALUE_HPP
+#ifndef TWOFLOWER_META_RECORD_VALUE_HPP
+#define TWOFLOWER_META_RECORD_VALUE_HPP
 
 #include <cstdint>
 #include <variant>
