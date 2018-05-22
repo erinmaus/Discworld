@@ -131,16 +131,15 @@ namespace twoflower
 	};
 
 	template <typename T>
-	struct Brochure::Iterator :
-		public std::iterator<
-			std::input_iterator_tag,
-			T,
-			std::size_t,
-			const T*,
-			const T&>
+	struct Brochure::Iterator
 	{
 	public:
 		friend class Brochure;
+
+		typedef std::input_iterator_tag iteratory_category;
+		typedef std::size_t difference_type;
+		typedef T* pointer;
+		typedef const T& value_type;
 
 		Iterator() = default;
 		~Iterator();
@@ -150,7 +149,7 @@ namespace twoflower
 		bool operator ==(const Iterator& other) const;
 		bool operator !=(const Iterator& other) const;
 
-		pointer operator ->() const;
+		const pointer operator ->() const;
 		value_type operator *() const;
 
 	private:
@@ -228,7 +227,7 @@ bool twoflower::Brochure::Iterator<T>::operator !=(
 }
 
 template <typename T>
-typename twoflower::Brochure::Iterator<T>::pointer
+const typename twoflower::Brochure::Iterator<T>::pointer
 twoflower::Brochure::Iterator<T>::operator ->() const
 {
 	return &value;
