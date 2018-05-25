@@ -79,7 +79,7 @@ namespace twoflower
 			const Resource& resource,
 			float quantity);
 
-		Iterator<ActionConstraint> action_constraints(
+		Iterator<ActionConstraint> action_constraints_begin(
 			ActionConstraint::Type type,
 			const Action& action) const;
 		Iterator<ActionConstraint> action_constraints_end() const;

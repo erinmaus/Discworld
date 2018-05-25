@@ -386,7 +386,7 @@ void twoflower::Brochure::connect(
 }
 
 twoflower::Brochure::Iterator<twoflower::ActionConstraint>
-twoflower::Brochure::action_constraints(
+twoflower::Brochure::action_constraints_begin(
 	ActionConstraint::Type type,
 	const Action& action) const
 {
