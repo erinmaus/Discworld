@@ -54,6 +54,45 @@ solution "Discworld"
 			path.join(_OPTIONS["deps"] or _DEFAULTS["deps"], "lib")
 		}
 
+	project "Mapp"
+		language "C++"
+		kind "SharedLib"
+
+		cppdialect "C++17"
+
+		configuration "Debug"
+			targetsuffix "_debug"
+			objdir "obj/mapp/debug"
+			targetdir "bin"
+		configuration "Release"
+			objdir "obj/mapp/release"
+			targetdir "bin"
+		configuration "windows"
+			defines { "MAPP_BUILDING_WINDOWS" }
+		configuration {}
+			runtime "release"
+
+		location "mapp"
+
+		files {
+			"mapp/include/**.hpp",
+			"mapp/source/**.cpp",
+			"mapp/source/**.hpp"
+		}
+
+		includedirs {
+			path.join(_OPTIONS["deps"] or _DEFAULTS["deps"], "include"),
+			"mapp/include",
+			"twoflower/include",
+		}
+
+		libdirs {
+			path.join(_OPTIONS["deps"] or _DEFAULTS["deps"], "lib")
+		}
+
+		links { "Twoflower", "lua51" }
+
+
 	project "Twoflower.Test"
 		language "C++"
 		kind "ConsoleApp"
