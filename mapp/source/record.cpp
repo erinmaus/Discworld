@@ -23,7 +23,7 @@ static int mapp_record_get(lua_State* L)
 	}
 	else if (lua_type(L, 2) == LUA_TNUMBER)
 	{
-		auto field = luaL_checkint(L, 2);
+		auto field = luaL_checknumber(L, 2);
 		if (field < 0)
 		{
 			luaL_error(L, "column must be greater than or equal to zero");
@@ -65,7 +65,7 @@ static int mapp_record_set(lua_State* L)
 		}
 		else if (lua_type(L, 2) == LUA_TNUMBER)
 		{
-			auto field = luaL_checkint(L, 2);
+			auto field = luaL_checknumber(L, 2);
 			if (field < 0)
 			{
 				luaL_error(L, "column must be greater than or equal to zero");
