@@ -56,7 +56,7 @@ bool twoflower::Record::set(const std::string& column, const RecordValue& value)
 
 bool twoflower::Record::set(std::size_t index, const RecordValue& value)
 {
-	if (index < values.size() && values[index].get_type() == value.get_type())
+	if (index < values.size())
 	{
 		values[index] = value;
 

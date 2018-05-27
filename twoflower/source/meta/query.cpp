@@ -51,8 +51,7 @@ bool twoflower::Query::set(const std::string& column, const RecordValue& value)
 
 bool twoflower::Query::set(std::size_t index, const RecordValue& value)
 {
-	if (index < definition->count() &&
-	    definition->get_type(index) == value.get_type())
+	if (index < definition->count())
 	{
 		values[index] = value;
 
