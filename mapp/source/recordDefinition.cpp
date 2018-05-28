@@ -39,7 +39,7 @@ static std::string mapp_record_definition_get_column_name(
 }
 
 extern "C"
-MAPP_EXPORT int luaopen_mapp_record_definition(lua_State* L)
+MAPP_EXPORT int luaopen_mapp_recorddefinition(lua_State* L)
 {
 	sol::usertype<twoflower::RecordDefinition> T(
 		sol::call_constructor, sol::constructors<twoflower::RecordDefinition(const std::string&)>(),
