@@ -10,7 +10,7 @@ graph.
 
 **Mapp** is a component that exposes the GameDB to Lua. It provides an interface to create resources, define their relationships, and so on
 in a text-based format. This means that a GameDB can be constructed from Lua
-code, which is great for source control! For an example of Mapp in action, see (https://github.com/aaronbolyard/itsyscape)[ItsyScape]'s ItsyScape.GameDB module and the corresponding construction script in Resources/Game/DB/Init.lua
+code, which is great for source control! For an example of Mapp in action, see [ItsyScape's](https://github.com/aaronbolyard/itsyscape) ItsyScape.GameDB module and the corresponding construction script in Resources/Game/DB/Init.lua
 
 ## Copyright & License
 
