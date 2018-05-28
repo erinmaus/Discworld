@@ -378,8 +378,8 @@ void twoflower::Brochure::connect(
 	query << " VALUES(?, ?, ?);";
 
 	auto statement = database->create_statement(query.str());
-	statement.bind(1, (int)action.get_id());
-	statement.bind(2, (int)resource.get_id());
+	statement.bind(1, (int)resource.get_id());
+	statement.bind(2, (int)action.get_id());
 	statement.bind(3, quantity);
 
 	statement.execute();
