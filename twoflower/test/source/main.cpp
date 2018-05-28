@@ -103,7 +103,7 @@ int main(int argc, const char* argv[]) try
 				action_definition.get_name().c_str(),
 				(int)i->get_id());
 
-			auto outputs_begin = brochure.action_constraints(twoflower::ActionConstraint::Type::output, *i);
+			auto outputs_begin = brochure.action_constraints_begin(twoflower::ActionConstraint::Type::output, *i);
 			auto outputs_end = brochure.action_constraints_end();
 
 			std::printf("  outputs:\n");
