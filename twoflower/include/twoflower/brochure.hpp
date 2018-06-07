@@ -36,6 +36,9 @@ namespace twoflower
 		bool try_get_action_definition(
 			const ID& id,
 			ActionDefinition& result) const;
+		bool try_get_action_definition(
+			const std::string& name,
+			ActionDefinition& result) const;
 
 		Iterator<ActionDefinition> action_definitions_begin() const;
 		Iterator<ActionDefinition> action_definitions_end() const;
@@ -54,7 +57,10 @@ namespace twoflower
 		ResourceType create_resource_type(const std::string& name);
 		bool try_get_resource_type(
 			const ID& id,
-			ResourceType& Result) const;
+			ResourceType& result) const;
+		bool try_get_resource_type(
+			const std::string& name,
+			ResourceType& result) const;
 
 		Iterator<ResourceType> resource_types_begin() const;
 		Iterator<ResourceType> resource_types_end() const;
@@ -69,6 +75,10 @@ namespace twoflower
 		Iterator<Resource> resources_begin() const;
 		Iterator<Resource> resources_end() const;
 		Iterator<Resource> resources_by_type(
+			const ResourceType& resource_type) const;
+		Iterator<Resource> resources_by_name(const std::string& name) const;
+		Iterator<Resource> resources_by_name_and_type(
+			const std::string& name,
 			const ResourceType& resource_type) const;
 
 		void connect(const Action& action, const Resource& resource);

@@ -72,6 +72,30 @@ bool twoflower::Brochure::try_get_action_definition(
 	}
 }
 
+bool twoflower::Brochure::try_get_action_definition(
+	const std::string& name,
+	ActionDefinition& result) const
+{
+	auto statement = database->create_statement(
+		"SELECT id FROM ActionDefinition WHERE name = ?;");
+	statement.bind(1, name);
+
+	if (statement.next())
+	{
+		int id;
+		statement.get("id", id);
+		result.set_id(id);
+
+		result.set_name(name);
+
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
 twoflower::Brochure::Iterator<twoflower::ActionDefinition>
 twoflower::Brochure::action_definitions_begin() const
 {
@@ -234,6 +258,30 @@ bool twoflower::Brochure::try_get_resource_type(
 	}
 }
 
+bool twoflower::Brochure::try_get_resource_type(
+	const std::string& name,
+	ResourceType& result) const
+{
+	auto statement = database->create_statement(
+		"SELECT id FROM ResourceType WHERE name = ?;");
+	statement.bind(1, name);
+
+	if (statement.next())
+	{
+		int id;
+		statement.get("id", id);
+		result.set_id(id);
+
+		result.set_name(name);
+
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
 twoflower::Brochure::Iterator<twoflower::ResourceType>
 twoflower::Brochure::resource_types_begin() const
 {
@@ -347,6 +395,29 @@ twoflower::Brochure::resources_by_type(
 	auto statement = database->create_statement(
 		"SELECT name, singleton FROM Resource WHERE resource_type_id = ?;");
 	statement.bind(1, (int)resource_type.get_id());
+	return Iterator<Resource>(*this, statement);
+}
+
+twoflower::Brochure::Iterator<twoflower::Resource>
+twoflower::Brochure::resources_by_name(
+	const std::string& name) const
+{
+	auto statement = database->create_statement(
+		"SELECT name, singleton FROM Resource WHERE name = ?;");
+	statement.bind(1, name);
+	return Iterator<Resource>(*this, statement);
+}
+
+twoflower::Brochure::Iterator<twoflower::Resource>
+twoflower::Brochure::resources_by_name_and_type(
+	const std::string& name,
+	const ResourceType& resource_type) const
+{
+	auto statement = database->create_statement(
+		"SELECT name, singleton FROM Resource"
+		" WHERE name = ? and resource_type_id = ?;");
+	statement.bind(1, name);
+	statement.bind(2, (int)resource_type.get_id());
 	return Iterator<Resource>(*this, statement);
 }
 

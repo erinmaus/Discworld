@@ -92,6 +92,25 @@ static auto mapp_find_resources_by_type(
 		brochure.resources_end());
 }
 
+static auto mapp_find_resources_by_name(
+	const twoflower::Brochure& brochure,
+	const std::string& name)
+{
+	return mapp_create_iterator<twoflower::Resource>(
+		brochure.resources_by_name(name),
+		brochure.resources_end());
+}
+
+static auto mapp_find_resources_by_name_and_type(
+	const twoflower::Brochure& brochure,
+	const std::string& name,
+	const twoflower::ResourceType& type)
+{
+	return mapp_create_iterator<twoflower::Resource>(
+		brochure.resources_by_name_and_type(name, type),
+		brochure.resources_end());
+}
+
 static void mapp_connect_action_to_resource(
 	twoflower::Brochure& brochure,
 	const twoflower::Action& action,
@@ -181,7 +200,7 @@ static void mapp_create_record(
 static int mapp_select(lua_State* L)
 {
 	auto& brochure = sol::stack::get<twoflower::Brochure>(L, 1);
-	auto& record_definition = sol::stack::get<twoflower::RecordDefinition>(L, 3);
+	auto& record_definition = sol::stack::get<twoflower::RecordDefinition>(L, 2);
 	auto& query = sol::stack::get<twoflower::Query>(L, 3);
 	auto limit = luaL_optint(L, 4, twoflower::Brochure::UNLIMITED_POWER);
 
@@ -189,9 +208,9 @@ static int mapp_select(lua_State* L)
 	int index = 1;
 	for (auto& i: brochure.select(record_definition, query, limit))
 	{
-		sol::stack::push(L, i);
 		lua_pushnumber(L, index);
-		lua_rawset(L, -2);
+		sol::stack::push(L, i);
+		lua_rawset(L, -3);
 	}
 
 	return 1;
@@ -203,7 +222,7 @@ MAPP_EXPORT int luaopen_mapp_brochure(lua_State* L)
 	sol::usertype<twoflower::Brochure> T(
 		sol::call_constructor, sol::constructors<twoflower::Brochure(), twoflower::Brochure(const std::string&)>(),
 		"createActionDefinition", &twoflower::Brochure::create_action_definition,
-		"tryGetActionDefinition", &twoflower::Brochure::try_get_action_definition,
+		"tryGetActionDefinition", sol::overload<bool (twoflower::Brochure::*)(const twoflower::ID&, twoflower::ActionDefinition& result) const, bool (twoflower::Brochure::*)(const std::string&, twoflower::ActionDefinition& result) const>(&twoflower::Brochure::try_get_action_definition, &twoflower::Brochure::try_get_action_definition),
 		"actionDefinitions", sol::property(&mapp_create_action_definitions_iterator),
 		"createAction", &twoflower::Brochure::create_action,
 		"tryGetAction", &twoflower::Brochure::try_get_action,
@@ -211,13 +230,15 @@ MAPP_EXPORT int luaopen_mapp_brochure(lua_State* L)
 		"findActionsByDefinition", &mapp_find_actions_by_resource,
 		"findActionsByResource", &mapp_find_actions_by_resource,
 		"createResourceType", &twoflower::Brochure::create_resource_type,
-		"tryGetResourceType", &twoflower::Brochure::try_get_resource_type,
+		"tryGetResourceType", sol::overload<bool (twoflower::Brochure::*)(const twoflower::ID&, twoflower::ResourceType& result) const, bool (twoflower::Brochure::*)(const std::string&, twoflower::ResourceType& result) const>(&twoflower::Brochure::try_get_resource_type, &twoflower::Brochure::try_get_resource_type),
 		"getResourceTypeFromResource", &twoflower::Brochure::get_resource_type,
 		"resourceTypes", &mapp_create_resource_types_iterator,
 		"createResource", &twoflower::Brochure::create_resource,
 		"tryGetResource", &twoflower::Brochure::try_get_resource,
 		"resources", &mapp_create_resources_iterator,
 		"findResourcesByType", &mapp_find_resources_by_type,
+		"findResourcesByName", &mapp_find_resources_by_name,
+		"findResourcesByNameAndType", &mapp_find_resources_by_name_and_type,
 		"connect", &mapp_connect_action_to_resource,
 		"connectInput", &mapp_connection_input_to_action,
 		"connectOutput", &mapp_connection_output_to_action,
