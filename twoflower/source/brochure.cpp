@@ -328,7 +328,7 @@ twoflower::Resource twoflower::Brochure::create_resource(
 bool twoflower::Brochure::try_get_resource(const ID& id, Resource& result) const
 {
 	auto statement = database->create_statement(
-		"SELECT name, singleton FROM Resource WHERE id = ?;");
+		"SELECT * FROM Resource WHERE id = ?;");
 	statement.bind(1, (int)id);
 
 	if (statement.next())
@@ -378,7 +378,7 @@ twoflower::Brochure::Iterator<twoflower::Resource>
 twoflower::Brochure::resources_begin() const
 {
 	auto statement = database->create_statement(
-		"SELECT name, singleton FROM Resource;");
+		"SELECT * FROM Resource;");
 	return Iterator<Resource>(*this, statement);
 }
 
@@ -393,7 +393,7 @@ twoflower::Brochure::resources_by_type(
 	const ResourceType& resource_type) const
 {
 	auto statement = database->create_statement(
-		"SELECT name, singleton FROM Resource WHERE resource_type_id = ?;");
+		"SELECT * FROM Resource WHERE resource_type_id = ?;");
 	statement.bind(1, (int)resource_type.get_id());
 	return Iterator<Resource>(*this, statement);
 }
@@ -414,7 +414,7 @@ twoflower::Brochure::resources_by_name_and_type(
 	const ResourceType& resource_type) const
 {
 	auto statement = database->create_statement(
-		"SELECT name, singleton FROM Resource"
+		"SELECT * FROM Resource"
 		" WHERE name = ? and resource_type_id = ?;");
 	statement.bind(1, name);
 	statement.bind(2, (int)resource_type.get_id());
