@@ -17,6 +17,7 @@ extern "C"
 #define SOL_SAFE_USERTYPE 1
 #define SOL_SAFE_FUNCTION 1
 #define SOL_CHECK_ARGUMENTS 1
+#define SOL_SAFE_GETTER 1
 #include "sol.hpp"
 
 #endif
