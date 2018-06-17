@@ -53,8 +53,7 @@ void twoflower::Brochure::Table::bind_foreign_key(
 	const std::string& self_column,
 	const std::string& reference_column)
 {
-	auto& foreign_key = foreign_keys[other_table];
-	foreign_key[self_column] = reference_column;
+	foreign_keys.emplace(self_column, std::make_pair(other_table, reference_column));
 }
 
 void twoflower::Brochure::Table::create(Brochure::Database& database) const
@@ -118,35 +117,18 @@ void twoflower::Brochure::Table::create(Brochure::Database& database) const
 		index = 1;
 		for (auto& i: foreign_keys)
 		{
-			auto& foreign_table = i.first;
-			auto& foreign_key = i.second;
+			auto& column = i.first;
+			auto& foreign_table = i.second.first;
+			auto& foreign_key = i.second.second;
 			std::size_t reference_index;
 
 			stream << "\t" << "FOREIGN KEY" << " " << "(";
-			reference_index = 1;
-			for (auto& reference: foreign_key)
-			{
-				stream << reference.first;
-
-				if (reference_index < foreign_key.size())
-				{
-					stream << "," << " ";
-				}
-				++reference_index;
-			}
+			
+			stream << column;
 
 			stream << ")" << " " << "REFERENCES" << " " << foreign_table << "(";
-			reference_index = 1;
-			for (auto& reference: foreign_key)
-			{
-				stream << reference.second;
 
-				if (reference_index < foreign_key.size())
-				{
-					stream << "," << " ";
-				}
-				++reference_index;
-			}
+			stream << foreign_key;
 
 			stream << ")" << " " << "ON DELETE CASCADE";
 

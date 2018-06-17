@@ -120,6 +120,7 @@ int main(int argc, const char* argv[]) try
 	definition.define("slash", twoflower::RecordDefinition::Type::integer);
 	definition.define("crush", twoflower::RecordDefinition::Type::integer);
 	definition.define("item", twoflower::RecordDefinition::Type::resource);
+	definition.define("item2", twoflower::RecordDefinition::Type::resource);
 
 	brochure.create(definition);
 
@@ -128,6 +129,7 @@ int main(int argc, const char* argv[]) try
 	record.set("slash", 7);
 	record.set("crush", 5);
 	record.set("item", helmet_item_resource);
+	record.set("item2", helmet_item_resource);
 
 	brochure.insert(definition, record);
 

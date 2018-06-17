@@ -52,8 +52,7 @@ namespace twoflower
 
 		std::string name;
 
-		typedef std::map<std::string, std::string> ForeignReference;
-		typedef std::map<std::string, ForeignReference> ForeignKeys;
+		typedef std::map<std::string, std::pair<std::string, std::string>> ForeignKeys;
 		ForeignKeys foreign_keys;
 
 		static const std::size_t COLUMN_NAME = 0;
