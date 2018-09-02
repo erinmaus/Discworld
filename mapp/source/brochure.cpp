@@ -211,6 +211,8 @@ static int mapp_select(lua_State* L)
 		lua_pushnumber(L, index);
 		sol::stack::push(L, i);
 		lua_rawset(L, -3);
+
+		++index;
 	}
 
 	return 1;
