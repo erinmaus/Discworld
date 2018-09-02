@@ -42,6 +42,7 @@ void mapp_record_value_to_lua(lua_State* L, const twoflower::RecordValue& value)
 					lua_pushnumber(L, v);
 				}
 			}
+			break;
 		case twoflower::RecordDefinition::Type::blob:
 			{
 				luaL_error(L, "blob unsupported");
