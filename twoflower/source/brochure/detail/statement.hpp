@@ -11,7 +11,7 @@
 
 #include <cstdint>
 #include <vector>
-#include <sqlite3.h>
+#include "sqlite3.h"
 #include "twoflower/brochure.hpp"
 #include "twoflower/meta/recordValue.hpp"
 

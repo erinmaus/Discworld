@@ -116,6 +116,9 @@ namespace twoflower
 		class Statement;
 		class Table;
 
+		static Statement* clone_statement(Statement* statement);
+		static void delete_statement(Statement* statement);
+
 		void statement_to_record(
 			const Statement& statement,
 			const RecordDefinition& definition,
@@ -131,31 +134,37 @@ namespace twoflower
 			static bool next(Statement& statement, T& value);
 		};
 
-		template <>
-		struct IteratorImpl<ActionDefinition>
-		{
-			static bool next(Statement& statement, ActionDefinition& value);
-		};
-
-		template <>
-		struct IteratorImpl<Action>
-		{
-			static bool next(Statement& statement, Action& value);
-		};
-
-		template <>
-		struct IteratorImpl<ResourceType>
-		{
-			static bool next(Statement& statement, ResourceType& value);
-		};
-
-		template <>
-		struct IteratorImpl<ActionConstraint>
-		{
-			static bool next(Statement& statement, ActionConstraint& value);
-		};
-
 		std::shared_ptr<Database> database;
+	};
+
+	template <>
+	struct Brochure::IteratorImpl<ActionDefinition>
+	{
+		static bool next(Statement& statement, ActionDefinition& value);
+	};
+
+	template <>
+	struct Brochure::IteratorImpl<Action>
+	{
+		static bool next(Statement& statement, Action& value);
+	};
+
+	template <>
+	struct Brochure::IteratorImpl<ResourceType>
+	{
+		static bool next(Statement& statement, ResourceType& value);
+	};
+
+	template <>
+	struct Brochure::IteratorImpl<Resource>
+	{
+		static bool next(Statement& statement, Resource& value);
+	};
+
+	template <>
+	struct Brochure::IteratorImpl<ActionConstraint>
+	{
+		static bool next(Statement& statement, ActionConstraint& value);
 	};
 
 	template <typename T>
@@ -170,6 +179,7 @@ namespace twoflower
 		typedef const T& value_type;
 
 		Iterator() = default;
+		Iterator(const Iterator& other);
 		~Iterator();
 
 		Iterator& operator ++();
@@ -177,21 +187,23 @@ namespace twoflower
 		bool operator ==(const Iterator& other) const;
 		bool operator !=(const Iterator& other) const;
 
+		Iterator& operator =(const Iterator& other);
+
 		pointer operator ->() const;
 		value_type operator *() const;
 
 	private:
 		explicit Iterator(
 			const Brochure& brochure,
-			Statement& statement);
+			Statement* statement);
 		explicit Iterator(
 			const Brochure& brochure,
-			Statement& statement,
+			Statement* statement,
 			const T& value);
 		void next();
 
 		const Brochure* brochure = nullptr;
-		std::shared_ptr<Statement> statement;
+		Statement* statement = nullptr;
 		bool end = true;
 		T value;
 	};
@@ -199,19 +211,25 @@ namespace twoflower
 
 template <typename T>
 twoflower::Brochure::Iterator<T>::Iterator(
-	const Brochure& brochure, Statement& statement) :
+	const Brochure& brochure, Statement* statement) :
 		brochure(&brochure),
-		statement(new Statement(statement)),
+		statement(statement),
 		end(false)
 {
 	next();
 }
 
 template <typename T>
+twoflower::Brochure::Iterator<T>::Iterator(const Iterator& other)
+{
+	*this = other;
+}
+
+template <typename T>
 twoflower::Brochure::Iterator<T>::Iterator(
-	const Brochure& brochure, Statement& statement, const T& value) :
+	const Brochure& brochure, Statement* statement, const T& value) :
 		brochure(&brochure),
-		statement(new Statement(statement)),
+		statement(statement),
 		end(false),
 		value(value)
 {
@@ -221,7 +239,11 @@ twoflower::Brochure::Iterator<T>::Iterator(
 template <typename T>
 twoflower::Brochure::Iterator<T>::~Iterator()
 {
-	// Nothing.
+	if (statement)
+	{
+		Brochure::delete_statement(statement);
+		statement = nullptr;
+	}
 }
 
 template <typename T>
@@ -244,7 +266,7 @@ template <typename T>
 bool twoflower::Brochure::Iterator<T>::operator ==(
 	const Iterator& other) const
 {
-	return statement.get() == other.statement.get() || (end && other.end);
+	return statement == other.statement || (end && other.end);
 }
 
 template <typename T>
@@ -252,6 +274,23 @@ bool twoflower::Brochure::Iterator<T>::operator !=(
 	const Iterator& other) const
 {
 	return !(*this == other);
+}
+
+template <typename T>
+twoflower::Brochure::Iterator<T>&
+twoflower::Brochure::Iterator<T>::operator =(const Iterator& other)
+{
+	if (statement)
+	{
+		Brochure::delete_statement(statement);
+	}
+
+	brochure = other.brochure;
+	statement = Brochure::clone_statement(other.statement);
+	end = other.end;
+	value = other.value;
+
+	return *this;
 }
 
 template <typename T>

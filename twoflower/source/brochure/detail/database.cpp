@@ -7,7 +7,7 @@
 // Copyright [bk]door.maus
 
 #include <stdexcept>
-#include <sqlite3.h>
+#include "sqlite3.h"
 #include "database.hpp"
 #include "statement.hpp"
 #include "table.hpp"

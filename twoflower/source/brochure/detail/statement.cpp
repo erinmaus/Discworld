@@ -8,7 +8,7 @@
 
 #include <cassert>
 #include <cstring>
-#include <sqlite3.h>
+#include "sqlite3.h"
 #include "twoflower/relationships/action.hpp"
 #include "twoflower/relationships/resource.hpp"
 #include "statement.hpp"

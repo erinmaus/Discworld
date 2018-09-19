@@ -13,7 +13,7 @@
 
 template <typename R, typename T>
 static typename std::function<sol::optional<R>(sol::this_state)>
-mapp_create_iterator(T& begin, T& end)
+mapp_create_iterator(T begin, T end)
 {
 	return [begin, end](sol::this_state S) mutable
 	{

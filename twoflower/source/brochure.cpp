@@ -101,7 +101,7 @@ twoflower::Brochure::action_definitions_begin() const
 {
 	auto statement = database->create_statement(
 		"SELECT * FROM ActionDefinition;");
-	return Iterator<ActionDefinition>(*this, statement);
+	return Iterator<ActionDefinition>(*this, new Statement(statement));
 }
 
 twoflower::Brochure::Iterator<twoflower::ActionDefinition>
@@ -178,7 +178,7 @@ twoflower::Brochure::actions_begin() const
 {
 	auto statement = database->create_statement(
 		"SELECT id FROM Action;");
-	return Iterator<Action>(*this, statement);
+	return Iterator<Action>(*this, new Statement(statement));
 }
 
 twoflower::Brochure::Iterator<twoflower::Action>
@@ -194,7 +194,7 @@ twoflower::Brochure::actions_by_definition(
 	auto statement = database->create_statement(
 		"SELECT id FROM Action WHERE action_definition_id = ?;");
 	statement.bind(1, (int)action_definition.get_id());
-	return Iterator<Action>(*this, statement);
+	return Iterator<Action>(*this, new Statement(statement));
 }
 
 twoflower::Brochure::Iterator<twoflower::Action>
@@ -207,7 +207,7 @@ twoflower::Brochure::actions_by_resource(
 		" ON ResourcesActions.resource_id = ?"
 		" AND ResourcesActions.action_id = Action.id;");
 	statement.bind(1, (int)resource.get_id());
-	return Iterator<Action>(*this, statement);
+	return Iterator<Action>(*this, new Statement(statement));
 }
 
 twoflower::ResourceType twoflower::Brochure::create_resource_type(
@@ -287,7 +287,7 @@ twoflower::Brochure::resource_types_begin() const
 {
 	auto statement = database->create_statement(
 		"SELECT * FROM ResourceType;");
-	return Iterator<ResourceType>(*this, statement);
+	return Iterator<ResourceType>(*this, new Statement(statement));
 }
 
 twoflower::Brochure::Iterator<twoflower::ResourceType>
@@ -379,7 +379,7 @@ twoflower::Brochure::resources_begin() const
 {
 	auto statement = database->create_statement(
 		"SELECT * FROM Resource;");
-	return Iterator<Resource>(*this, statement);
+	return Iterator<Resource>(*this, new Statement(statement));
 }
 
 twoflower::Brochure::Iterator<twoflower::Resource>
@@ -395,7 +395,7 @@ twoflower::Brochure::resources_by_type(
 	auto statement = database->create_statement(
 		"SELECT * FROM Resource WHERE resource_type_id = ?;");
 	statement.bind(1, (int)resource_type.get_id());
-	return Iterator<Resource>(*this, statement);
+	return Iterator<Resource>(*this, new Statement(statement));
 }
 
 twoflower::Brochure::Iterator<twoflower::Resource>
@@ -405,7 +405,7 @@ twoflower::Brochure::resources_by_name(
 	auto statement = database->create_statement(
 		"SELECT name, singleton FROM Resource WHERE name = ?;");
 	statement.bind(1, name);
-	return Iterator<Resource>(*this, statement);
+	return Iterator<Resource>(*this, new Statement(statement));
 }
 
 twoflower::Brochure::Iterator<twoflower::Resource>
@@ -418,7 +418,7 @@ twoflower::Brochure::resources_by_name_and_type(
 		" WHERE name = ? and resource_type_id = ?;");
 	statement.bind(1, name);
 	statement.bind(2, (int)resource_type.get_id());
-	return Iterator<Resource>(*this, statement);
+	return Iterator<Resource>(*this, new Statement(statement));
 }
 
 void twoflower::Brochure::connect(
@@ -471,7 +471,7 @@ twoflower::Brochure::action_constraints_begin(
 
 	return Iterator<twoflower::ActionConstraint>(
 		*this,
-		statement,
+		new Statement(statement),
 		ActionConstraint(type));
 }
 
@@ -748,6 +748,24 @@ twoflower::Record twoflower::Brochure::select_one(
 	}
 
 	return Record(definition);
+}
+
+twoflower::Brochure::Statement* twoflower::Brochure::clone_statement(Statement* statement)
+{
+	if (statement == nullptr)
+	{
+		return nullptr;
+	}
+
+	return new Statement(*statement);
+}
+
+void twoflower::Brochure::delete_statement(Statement* statement)
+{
+	if (statement != nullptr)
+	{
+		delete statement;
+	}
 }
 
 void twoflower::Brochure::statement_to_record(

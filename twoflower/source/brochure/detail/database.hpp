@@ -9,7 +9,7 @@
 #ifndef TWOFLOWER_DETAIL_BROCHURE_DATABASE_HPP
 #define TWOFLOWER_DETAIL_BROCHURE_DATABASE_HPP
 
-#include <sqlite3.h>
+#include "sqlite3.h"
 #include "twoflower/brochure.hpp"
 
 namespace twoflower
