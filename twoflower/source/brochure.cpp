@@ -389,6 +389,16 @@ twoflower::Brochure::resources_end() const
 }
 
 twoflower::Brochure::Iterator<twoflower::Resource>
+twoflower::Brochure::resources_by_action(
+	const Action& action) const
+{
+	auto statement = database->create_statement(
+		"SELECT * FROM Resource INNER JOIN ResourcesActions ON action_id = ? and resource_id = Resource.id;");
+	statement.bind(1, (int)action.get_id());
+	return Iterator<Resource>(*this, new Statement(statement));
+}
+
+twoflower::Brochure::Iterator<twoflower::Resource>
 twoflower::Brochure::resources_by_type(
 	const ResourceType& resource_type) const
 {

@@ -74,6 +74,8 @@ namespace twoflower
 
 		Iterator<Resource> resources_begin() const;
 		Iterator<Resource> resources_end() const;
+		Iterator<Resource> resources_by_action(
+			const Action& action) const;
 		Iterator<Resource> resources_by_type(
 			const ResourceType& resource_type) const;
 		Iterator<Resource> resources_by_name(const std::string& name) const;

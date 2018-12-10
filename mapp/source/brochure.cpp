@@ -83,6 +83,15 @@ static auto mapp_create_resources_iterator(
 		brochure.resources_end());
 }
 
+static auto mapp_find_resources_by_action(
+	const twoflower::Brochure& brochure,
+	const twoflower::Action& action)
+{
+	return mapp_create_iterator<twoflower::Resource>(
+		brochure.resources_by_action(action),
+		brochure.resources_end());
+}
+
 static auto mapp_find_resources_by_type(
 	const twoflower::Brochure& brochure,
 	const twoflower::ResourceType& type)
@@ -239,6 +248,7 @@ MAPP_EXPORT int luaopen_mapp_brochure(lua_State* L)
 		"createResource", &twoflower::Brochure::create_resource,
 		"tryGetResource", &twoflower::Brochure::try_get_resource,
 		"resources", sol::property(&mapp_create_resources_iterator),
+		"findResourcesByAction", &mapp_find_resources_by_action,
 		"findResourcesByType", &mapp_find_resources_by_type,
 		"findResourcesByName", &mapp_find_resources_by_name,
 		"findResourcesByNameAndType", &mapp_find_resources_by_name_and_type,
