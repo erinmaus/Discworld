@@ -11,8 +11,12 @@
 
 extern "C"
 {
-	#include "lua.h"
+	#include <lua.h>
+	#include <lualib.h>
+	#include <lauxlib.h>
 }
+
+#include <limits>
 
 #define SOL_SAFE_USERTYPE 1
 #define SOL_SAFE_FUNCTION 1

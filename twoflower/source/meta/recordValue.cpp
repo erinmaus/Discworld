@@ -6,6 +6,7 @@
 //
 // Copyright [bk]door.maus
 
+#include <stdexcept>
 #include "twoflower/meta/recordValue.hpp"
 
 void twoflower::RecordValue::set(int value)
