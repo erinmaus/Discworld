@@ -244,7 +244,7 @@ MAPP_EXPORT int luaopen_mapp_brochure(lua_State* L)
 		"createResourceType", &twoflower::Brochure::create_resource_type,
 		"tryGetResourceType", sol::overload<bool (twoflower::Brochure::*)(const twoflower::ID&, twoflower::ResourceType& result) const, bool (twoflower::Brochure::*)(const std::string&, twoflower::ResourceType& result) const>(&twoflower::Brochure::try_get_resource_type, &twoflower::Brochure::try_get_resource_type),
 		"getResourceTypeFromResource", &twoflower::Brochure::get_resource_type,
-		"resourceTypes", &mapp_create_resource_types_iterator,
+		"resourceTypes", sol::property(&mapp_create_resource_types_iterator),
 		"createResource", &twoflower::Brochure::create_resource,
 		"tryGetResource", &twoflower::Brochure::try_get_resource,
 		"resources", sol::property(&mapp_create_resources_iterator),
@@ -265,7 +265,7 @@ MAPP_EXPORT int luaopen_mapp_brochure(lua_State* L)
 		"createRecord", &mapp_create_record,
 		"insert", &twoflower::Brochure::insert,
 		"select", &mapp_select,
-		"select_one", &twoflower::Brochure::select_one
+		"selectOne", &twoflower::Brochure::select_one
 	);
 
 	sol::stack::push(L, T);
